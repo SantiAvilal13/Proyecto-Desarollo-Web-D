@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regata Online - Partidas Disponibles</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/regata">
+                <i class="fas fa-ship"></i> Regata Online
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/regata">Inicio</a>
+                <a class="nav-link" href="/juego/ayuda">Ayuda</a>
+                <a class="nav-link" href="/auth/logout">Cerrar Sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-trophy"></i> Partidas Disponibles</h2>
+                    <a href="/regata/partidas/create" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Nueva Partida
+                    </a>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(partidas)}" class="text-center py-5">
+                            <i class="fas fa-ship fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No hay partidas disponibles</h4>
+                            <p class="text-muted">Crea una nueva partida para comenzar a jugar</p>
+                            <a href="/regata/partidas/create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Crear Primera Partida
+                            </a>
+                        </div>
+
+                        <div th:if="${!#lists.isEmpty(partidas)}" class="row">
+                            <div th:each="partida : ${partidas}" class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-header bg-light">
+                                        <h5 class="card-title mb-0" th:text="${partida.nombre}"></h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <span class="badge" 
+                                                  th:classappend="${partida.estado.name() == 'EN_CURSO'} ? 'bg-success' : 
+                                                                 (${partida.estado.name() == 'CREADA'} ? 'bg-warning' : 'bg-secondary')"
+                                                  th:text="${partida.estado}"></span>
+                                        </div>
+                                        
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                <i class="fas fa-map"></i> 
+                                                Mapa: <span th:text="${partida.mapa.nombre}"></span><br>
+                                                <i class="fas fa-expand-arrows-alt"></i> 
+                                                Dimensiones: <span th:text="${partida.mapa.ancho} + 'x' + ${partida.mapa.alto}"></span><br>
+                                                <i class="fas fa-calendar"></i> 
+                                                Creada: <span th:text="${#temporals.format(partida.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></span>
+                                            </small>
+                                        </p>
+                                        
+                                        <!-- Información de participantes -->
+                                        <div class="mb-3">
+                                            <h6 class="text-muted">Participantes:</h6>
+                                            <div th:if="${partida.participaciones != null and !#lists.isEmpty(partida.participaciones)}">
+                                                <div th:each="participacion : ${partida.participaciones}" class="d-flex align-items-center mb-1">
+                                                    <div class="rounded-circle me-2" 
+                                                         th:style="'width: 20px; height: 20px; background-color: ' + ${participacion.barco.modelo.color} + ';'"></div>
+                                                    <small th:text="${participacion.jugador.nombre}"></small>
+                                                    <span class="badge badge-sm ms-auto" 
+                                                          th:classappend="${participacion.barco.estado.name() == 'VIVO'} ? 'bg-success' : 
+                                                                         (${participacion.barco.estado.name() == 'LLEGO'} ? 'bg-primary' : 'bg-danger')"
+                                                          th:text="${participacion.barco.estado}"></span>
+                                                </div>
+                                            </div>
+                                            <div th:if="${partida.participaciones == null or #lists.isEmpty(partida.participaciones)}">
+                                                <small class="text-muted">Sin participantes</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card-footer bg-transparent">
+                                        <div class="d-grid gap-2">
+                                            <a th:if="${partida.estado.name() == 'EN_CURSO' or partida.estado.name() == 'CREADA'}" 
+                                               th:href="@{/juego/partida/{id}(id=${partida.id})}" 
+                                               class="btn btn-primary">
+                                                <i class="fas fa-play"></i> 
+                                                <span th:text="${partida.estado.name() == 'EN_CURSO'} ? 'Continuar Juego' : 'Unirse'"></span>
+                                            </a>
+                                            
+                                            <a th:if="${partida.estado.name() == 'FINALIZADA'}" 
+                                               th:href="@{/juego/partida/{id}(id=${partida.id})}" 
+                                               class="btn btn-outline-secondary">
+                                                <i class="fas fa-eye"></i> Ver Resultado
+                                            </a>
+                                            
+                                            <div class="btn-group" role="group">
+                                                <a th:href="@{/regata/partidas/{id}(id=${partida.id})}" 
+                                                   class="btn btn-outline-info btn-sm">
+                                                    <i class="fas fa-info-circle"></i> Detalles
+                                                </a>
+                                                <a th:href="@{/regata/partidas/{id}/edit(id=${partida.id})}" 
+                                                   class="btn btn-outline-warning btn-sm">
+                                                    <i class="fas fa-edit"></i> Editar
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información adicional -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-info-circle"></i> Cómo Jugar</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success"></i> Selecciona una partida activa</li>
+                            <li><i class="fas fa-check text-success"></i> Mueve tu barco usando los controles</li>
+                            <li><i class="fas fa-check text-success"></i> Evita las paredes (X)</li>
+                            <li><i class="fas fa-check text-success"></i> Llega primero a la meta (M)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card border-warning">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="fas fa-gamepad"></i> Controles</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-arrows-alt text-primary"></i> Usa los botones direccionales</li>
+                            <li><i class="fas fa-tachometer-alt text-primary"></i> Cambia velocidad: -1, 0, +1</li>
+                            <li><i class="fas fa-pause text-warning"></i> Botón central mantiene velocidad</li>
+                            <li><i class="fas fa-sync-alt text-info"></i> El tablero se actualiza automáticamente</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

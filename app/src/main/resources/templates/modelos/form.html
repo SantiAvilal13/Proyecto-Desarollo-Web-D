@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title th:text="${modelo.id != null ? 'Editar Modelo' : 'Nuevo Modelo'}">Modelo</title>
+</head>
+<body>
+    <main>
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title mb-0">
+                                <i class="fas fa-cogs me-2"></i>
+                                <span th:text="${modelo.id != null ? 'Editar Modelo' : 'Nuevo Modelo'}"></span>
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <!-- Mensajes de error -->
+                            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <span th:text="${errorMessage}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+
+                            <form th:action="${modelo.id != null ? '/modelos/' + modelo.id : '/modelos'}" 
+                                  th:object="${modelo}" 
+                                  method="post" 
+                                  novalidate>
+                                
+                                <!-- Nombre -->
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label">
+                                        <i class="fas fa-tag me-1"></i>Nombre del Modelo *
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           th:class="${#fields.hasErrors('nombre')} ? 'form-control is-invalid' : 'form-control'"
+                                           id="nombre" 
+                                           th:field="*{nombre}" 
+                                           placeholder="Ej: Velero Clase J"
+                                           required>
+                                    <div th:if="${#fields.hasErrors('nombre')}" class="invalid-feedback">
+                                        <span th:errors="*{nombre}"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Eslora -->
+                                <div class="mb-3">
+                                    <label for="eslora" class="form-label">
+                                        <i class="fas fa-ruler-horizontal me-1"></i>Eslora (metros) *
+                                    </label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           th:class="${#fields.hasErrors('eslora')} ? 'form-control is-invalid' : 'form-control'"
+                                           id="eslora" 
+                                           th:field="*{eslora}" 
+                                           step="0.01"
+                                           min="1"
+                                           placeholder="Ej: 12.50"
+                                           required>
+                                    <div class="form-text">Longitud total del barco en metros</div>
+                                    <div th:if="${#fields.hasErrors('eslora')}" class="invalid-feedback">
+                                        <span th:errors="*{eslora}"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Manga -->
+                                <div class="mb-3">
+                                    <label for="manga" class="form-label">
+                                        <i class="fas fa-arrows-alt-h me-1"></i>Manga (metros) *
+                                    </label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           th:class="${#fields.hasErrors('manga')} ? 'form-control is-invalid' : 'form-control'"
+                                           id="manga" 
+                                           th:field="*{manga}" 
+                                           step="0.01"
+                                           min="0.5"
+                                           placeholder="Ej: 3.80"
+                                           required>
+                                    <div class="form-text">Ancho máximo del barco en metros</div>
+                                    <div th:if="${#fields.hasErrors('manga')}" class="invalid-feedback">
+                                        <span th:errors="*{manga}"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Velocidad Máxima -->
+                                <div class="mb-3">
+                                    <label for="velocidadMaxima" class="form-label">
+                                        <i class="fas fa-tachometer-alt me-1"></i>Velocidad Máxima (nudos) *
+                                    </label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           th:class="${#fields.hasErrors('velocidadMaxima')} ? 'form-control is-invalid' : 'form-control'"
+                                           id="velocidadMaxima" 
+                                           th:field="*{velocidadMaxima}" 
+                                           step="0.1"
+                                           min="1"
+                                           placeholder="Ej: 25.5"
+                                           required>
+                                    <div class="form-text">Velocidad máxima en nudos marinos</div>
+                                    <div th:if="${#fields.hasErrors('velocidadMaxima')}" class="invalid-feedback">
+                                        <span th:errors="*{velocidadMaxima}"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Descripción -->
+                                <div class="mb-4">
+                                    <label for="descripcion" class="form-label">
+                                        <i class="fas fa-align-left me-1"></i>Descripción
+                                    </label>
+                                    <textarea class="form-control" 
+                                              th:class="${#fields.hasErrors('descripcion')} ? 'form-control is-invalid' : 'form-control'"
+                                              id="descripcion" 
+                                              th:field="*{descripcion}" 
+                                              rows="3"
+                                              placeholder="Descripción opcional del modelo de barco..."></textarea>
+                                    <div th:if="${#fields.hasErrors('descripcion')}" class="invalid-feedback">
+                                        <span th:errors="*{descripcion}"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Botones -->
+                                <div class="d-flex justify-content-between">
+                                    <a th:href="@{/modelos}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i>Volver
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>
+                                        <span th:text="${modelo.id != null ? 'Actualizar' : 'Crear'}"></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

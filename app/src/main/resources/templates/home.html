@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Dashboard - Regata Online</title>
+</head>
+<body>
+    <main>
+        <div class="container mt-4">
+            <!-- Encabezado de bienvenida -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="jumbotron bg-primary text-white rounded p-5">
+                        <h1 class="display-4">
+                            <i class="fas fa-ship me-3"></i>
+                            Bienvenido a Regata Online
+                        </h1>
+                        <p class="lead">Sistema de gestión integral para regatas y competencias náuticas</p>
+                        <hr class="my-4 bg-white">
+                        <p>Administra modelos de barcos, jugadores, embarcaciones y organiza emocionantes partidas de regata.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensajes de error -->
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Tarjetas de estadísticas -->
+            <div class="row mb-4">
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-cogs fa-2x mb-2"></i>
+                            <h3 th:text="${totalModelos}">0</h3>
+                            <p class="card-text">Modelos</p>
+                        </div>
+                        <div class="card-footer">
+                            <a th:href="@{/modelos}" class="text-white text-decoration-none">
+                                <small><i class="fas fa-arrow-right me-1"></i>Ver todos</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-users fa-2x mb-2"></i>
+                            <h3 th:text="${totalJugadores}">0</h3>
+                            <p class="card-text">Jugadores</p>
+                        </div>
+                        <div class="card-footer">
+                            <a th:href="@{/jugadores}" class="text-white text-decoration-none">
+                                <small><i class="fas fa-arrow-right me-1"></i>Ver todos</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-anchor fa-2x mb-2"></i>
+                            <h3 th:text="${totalBarcos}">0</h3>
+                            <p class="card-text">Barcos</p>
+                        </div>
+                        <div class="card-footer">
+                            <a th:href="@{/barcos}" class="text-white text-decoration-none">
+                                <small><i class="fas fa-arrow-right me-1"></i>Ver todos</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                    <div class="card bg-warning text-dark h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-trophy fa-2x mb-2"></i>
+                            <h3 th:text="${totalPartidas}">0</h3>
+                            <p class="card-text">Partidas</p>
+                        </div>
+                        <div class="card-footer">
+                            <a th:href="@{/partidas}" class="text-dark text-decoration-none">
+                                <small><i class="fas fa-arrow-right me-1"></i>Ver todas</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                    <div class="card bg-secondary text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-map fa-2x mb-2"></i>
+                            <h3 th:text="${totalMapas}">0</h3>
+                            <p class="card-text">Mapas</p>
+                        </div>
+                        <div class="card-footer">
+                            <a th:href="@{/mapa}" class="text-white text-decoration-none">
+                                <small><i class="fas fa-arrow-right me-1"></i>Ver todos</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                    <div class="card bg-dark text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-chart-line fa-2x mb-2"></i>
+                            <h3 th:text="${totalModelos + totalJugadores + totalBarcos + totalPartidas + totalMapas}">0</h3>
+                            <p class="card-text">Total</p>
+                        </div>
+                        <div class="card-footer">
+                            <small class="text-muted">Elementos totales</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones rápidas -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-bolt me-2"></i>
+                                Acciones Rápidas
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-6 mb-3">
+                                    <a th:href="@{/modelos/new}" class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-plus me-2"></i>
+                                        Nuevo Modelo
+                                    </a>
+                                </div>
+                                <div class="col-lg-3 col-md-6 mb-3">
+                                    <a th:href="@{/jugadores/new}" class="btn btn-outline-success w-100">
+                                        <i class="fas fa-user-plus me-2"></i>
+                                        Nuevo Jugador
+                                    </a>
+                                </div>
+                                <div class="col-lg-3 col-md-6 mb-3">
+                                    <a th:href="@{/barcos/new}" class="btn btn-outline-info w-100">
+                                        <i class="fas fa-ship me-2"></i>
+                                        Nuevo Barco
+                                    </a>
+                                </div>
+                                <div class="col-lg-3 col-md-6 mb-3">
+                                    <a th:href="@{/partidas/new}" class="btn btn-outline-warning w-100">
+                                        <i class="fas fa-trophy me-2"></i>
+                                        Nueva Partida
+                                    </a>
+                                </div>
+                                <div class="col-lg-3 col-md-6 mb-3">
+                                    <a th:href="@{/simulacion}" class="btn btn-outline-danger w-100">
+                                        <i class="fas fa-play me-2"></i>
+                                        Simulación
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actividad reciente -->
+            <div class="row">
+                <!-- Jugadores recientes -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-users me-2"></i>
+                                Jugadores Recientes
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div th:if="${jugadoresRecientes.empty}" class="text-center text-muted py-3">
+                                <i class="fas fa-users fa-2x mb-2"></i>
+                                <p>No hay jugadores registrados</p>
+                                <a th:href="@{/jugadores/new}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-plus me-1"></i>Crear Primer Jugador
+                                </a>
+                            </div>
+                            <div th:unless="${jugadoresRecientes.empty}">
+                                <div th:each="jugador : ${jugadoresRecientes}" class="d-flex align-items-center mb-2">
+                                    <div class="me-3">
+                                        <i class="fas fa-user-circle fa-lg text-muted"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <a th:href="@{'/jugadores/' + ${jugador.id}}" 
+                                           class="text-decoration-none fw-bold" 
+                                           th:text="${jugador.nombreCompleto}"></a>
+                                        <br>
+                                        <small class="text-muted" th:text="${jugador.email}"></small>
+                                    </div>
+                                    <div>
+                                        <span th:if="${jugador.activo}" class="badge bg-success">Activo</span>
+                                        <span th:unless="${jugador.activo}" class="badge bg-secondary">Inactivo</span>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <a th:href="@{/jugadores}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-arrow-right me-1"></i>Ver Todos
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barcos recientes -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-anchor me-2"></i>
+                                Barcos Recientes
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div th:if="${barcosRecientes.empty}" class="text-center text-muted py-3">
+                                <i class="fas fa-anchor fa-2x mb-2"></i>
+                                <p>No hay barcos registrados</p>
+                                <a th:href="@{/barcos/new}" class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-plus me-1"></i>Crear Primer Barco
+                                </a>
+                            </div>
+                            <div th:unless="${barcosRecientes.empty}">
+                                <div th:each="barco : ${barcosRecientes}" class="d-flex align-items-center mb-2">
+                                    <div class="me-3">
+                                        <i class="fas fa-ship fa-lg text-muted"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <a th:href="@{'/barcos/' + ${barco.id}}" 
+                                           class="text-decoration-none fw-bold" 
+                                           th:text="${barco.nombre}"></a>
+                                        <br>
+                                        <small class="text-muted" th:text="${barco.modelo.nombre}"></small>
+                                    </div>
+                                    <div>
+                                        <span th:if="${barco.activo}" class="badge bg-success">Activo</span>
+                                        <span th:unless="${barco.activo}" class="badge bg-secondary">Inactivo</span>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <a th:href="@{/barcos}" class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-arrow-right me-1"></i>Ver Todos
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Partidas recientes -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-trophy me-2"></i>
+                                Partidas Recientes
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div th:if="${partidasRecientes.empty}" class="text-center text-muted py-3">
+                                <i class="fas fa-trophy fa-2x mb-2"></i>
+                                <p>No hay partidas registradas</p>
+                                <a th:href="@{/partidas/new}" class="btn btn-sm btn-outline-warning">
+                                    <i class="fas fa-plus me-1"></i>Crear Primera Partida
+                                </a>
+                            </div>
+                            <div th:unless="${partidasRecientes.empty}">
+                                <div th:each="partida : ${partidasRecientes}" class="d-flex align-items-center mb-2">
+                                    <div class="me-3">
+                                        <i class="fas fa-trophy fa-lg text-muted"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <a th:href="@{'/partidas/' + ${partida.id}}" 
+                                           class="text-decoration-none fw-bold" 
+                                           th:text="${partida.nombre}"></a>
+                                        <br>
+                                        <small class="text-muted" th:text="${#temporals.format(partida.fechaInicio, 'dd/MM/yyyy')}"></small>
+                                    </div>
+                                    <div>
+                                        <span th:switch="${partida.estado.name()}">
+                                            <span th:case="'PENDIENTE'" class="badge bg-warning text-dark">Pendiente</span>
+                                            <span th:case="'EN_CURSO'" class="badge bg-primary">En Curso</span>
+                                            <span th:case="'FINALIZADA'" class="badge bg-success">Finalizada</span>
+                                            <span th:case="'CANCELADA'" class="badge bg-danger">Cancelada</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <a th:href="@{/partidas}" class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-arrow-right me-1"></i>Ver Todas
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información del sistema -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6 class="card-title">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Sistema de Regatas Online
+                            </h6>
+                            <p class="card-text text-muted mb-0">
+                                Versión 1.0.0 - Desarrollado para la gestión integral de competencias náuticas
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

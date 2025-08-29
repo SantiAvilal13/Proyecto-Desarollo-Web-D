@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Lista de Barcos</title>
+</head>
+<body>
+    <main>
+        <div class="container mt-4">
+            <!-- Encabezado -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-ship me-2 text-primary"></i>
+                    Lista de Barcos
+                </h2>
+                <a th:href="@{/barcos/new}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Nuevo Barco
+                </a>
+            </div>
+
+            <!-- Mensajes de éxito/error -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form th:action="@{/barcos}" method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="jugadorId" class="form-label">Filtrar por Jugador:</label>
+                            <select class="form-select" id="jugadorId" name="jugadorId">
+                                <option value="">Todos los jugadores</option>
+                                <option th:each="jugador : ${jugadores}" 
+                                        th:value="${jugador.id}" 
+                                        th:text="${jugador.nombre}"
+                                        th:selected="${param.jugadorId != null and param.jugadorId[0] == jugador.id.toString()}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="modeloId" class="form-label">Filtrar por Modelo:</label>
+                            <select class="form-select" id="modeloId" name="modeloId">
+                                <option value="">Todos los modelos</option>
+                                <option th:each="modelo : ${modelos}" 
+                                        th:value="${modelo.id}" 
+                                        th:text="${modelo.nombre}"
+                                        th:selected="${param.modeloId != null and param.modeloId[0] == modelo.id.toString()}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-filter me-1"></i>Filtrar
+                            </button>
+                            <a th:href="@{/barcos}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>Limpiar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabla de barcos -->
+            <div class="card">
+                <div class="card-body">
+                    <div th:if="${barcos.empty}" class="text-center py-5">
+                        <i class="fas fa-ship fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No hay barcos registrados</h4>
+                        <p class="text-muted">Comienza creando tu primer barco</p>
+                        <a th:href="@{/barcos/new}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Crear Primer Barco
+                        </a>
+                    </div>
+
+                    <div th:unless="${barcos.empty}" class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">
+                                        <i class="fas fa-hashtag me-1"></i>ID
+                                    </th>
+                                    <th scope="col">
+                                        <i class="fas fa-tag me-1"></i>Nombre
+                                    </th>
+                                    <th scope="col">
+                                        <i class="fas fa-user me-1"></i>Propietario
+                                    </th>
+                                    <th scope="col">
+                                        <i class="fas fa-ship me-1"></i>Modelo
+                                    </th>
+                                    <th scope="col">
+                                        <i class="fas fa-tachometer-alt me-1"></i>Velocidad
+                                    </th>
+                                    <th scope="col">
+                                        <i class="fas fa-map-marker-alt me-1"></i>Posición
+                                    </th>
+                                    <th scope="col">
+                                        <i class="fas fa-toggle-on me-1"></i>Estado
+                                    </th>
+                                    <th scope="col" class="text-center">
+                                        <i class="fas fa-cogs me-1"></i>Acciones
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="barco : ${barcos}">
+                                    <td>
+                                        <span class="badge bg-secondary" th:text="${barco.id}"></span>
+                                    </td>
+                                    <td>
+                                        <strong th:text="${barco.nombre}"></strong>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-user me-1 text-muted"></i>
+                                        <span th:text="${barco.jugador.nombre}"></span>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-ship me-1 text-muted"></i>
+                                        <span th:text="${barco.modelo.nombre}"></span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info" th:text="${barco.velocidadActual} + ' nudos'"></span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            <i class="fas fa-crosshairs me-1"></i>
+                                            (<span th:text="${barco.posicionX}"></span>, <span th:text="${barco.posicionY}"></span>)
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <span th:if="${barco.activo}" class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>Activo
+                                        </span>
+                                        <span th:unless="${barco.activo}" class="badge bg-secondary">
+                                            <i class="fas fa-times-circle me-1"></i>Inactivo
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a th:href="@{'/barcos/' + ${barco.id}}" 
+                                               class="btn btn-outline-info btn-sm" 
+                                               title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a th:href="@{'/barcos/' + ${barco.id} + '/edit'}" 
+                                               class="btn btn-outline-warning btn-sm" 
+                                               title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-outline-danger btn-sm" 
+                                                    title="Eliminar"
+                                                    data-bs-toggle="modal" 
+                                                    th:data-bs-target="'#deleteModal' + ${barco.id}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div th:unless="${barcos.empty}" class="mt-3">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">
+                                    <i class="fas fa-ship text-primary me-2"></i>
+                                    Total de Barcos
+                                </h5>
+                                <h2 class="text-primary" th:text="${barcos.size()}"></h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Barcos Activos
+                                </h5>
+                                <h2 class="text-success" th:text="${#lists.size(#lists.select(barcos, 'activo'))}"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modales de confirmación de eliminación -->
+        <div th:each="barco : ${barcos}" 
+             class="modal fade" 
+             th:id="'deleteModal' + ${barco.id}" 
+             tabindex="-1" 
+             th:aria-labelledby="'deleteModalLabel' + ${barco.id}" 
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" th:id="'deleteModalLabel' + ${barco.id}">
+                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                            Confirmar Eliminación
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar el barco <strong th:text="${barco.nombre}"></strong>?</p>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </button>
+                        <form th:action="@{'/barcos/' + ${barco.id} + '/delete'}" method="post" style="display: inline;">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i>Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

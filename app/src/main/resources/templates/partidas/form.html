@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title th:text="${partida.id != null ? 'Editar Partida' : 'Nueva Partida'}">Formulario de Partida</title>
+</head>
+<body>
+    <main>
+        <div class="container mt-4">
+            <!-- Encabezado -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-trophy me-2 text-primary"></i>
+                    <span th:text="${partida.id != null ? 'Editar Partida' : 'Nueva Partida'}"></span>
+                </h2>
+                <a th:href="@{/partidas}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Volver a la Lista
+                </a>
+            </div>
+
+            <!-- Mensajes de error -->
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Formulario -->
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-edit me-2"></i>
+                                Información de la Partida
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="${partida.id != null ? '/partidas/' + partida.id : '/partidas'}" 
+                                  method="post" 
+                                  th:object="${partida}" 
+                                  novalidate>
+                                
+                                <!-- Nombre -->
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label">
+                                        <i class="fas fa-tag me-1 text-muted"></i>
+                                        Nombre de la Partida <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="nombre" 
+                                           th:field="*{nombre}" 
+                                           th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''"
+                                           placeholder="Ej: Regata de Primavera 2024"
+                                           required>
+                                    <div th:if="${#fields.hasErrors('nombre')}" class="invalid-feedback">
+                                        <span th:errors="*{nombre}"></span>
+                                    </div>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Ingresa un nombre descriptivo para la partida
+                                    </div>
+                                </div>
+
+                                <!-- Descripción -->
+                                <div class="mb-3">
+                                    <label for="descripcion" class="form-label">
+                                        <i class="fas fa-align-left me-1 text-muted"></i>
+                                        Descripción
+                                    </label>
+                                    <textarea class="form-control" 
+                                              id="descripcion" 
+                                              th:field="*{descripcion}" 
+                                              th:classappend="${#fields.hasErrors('descripcion')} ? 'is-invalid' : ''"
+                                              rows="3"
+                                              placeholder="Descripción opcional de la partida..."></textarea>
+                                    <div th:if="${#fields.hasErrors('descripcion')}" class="invalid-feedback">
+                                        <span th:errors="*{descripcion}"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Mapa -->
+                                <div class="mb-3">
+                                    <label for="mapa" class="form-label">
+                                        <i class="fas fa-map me-1 text-muted"></i>
+                                        Mapa <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" 
+                                            id="mapa" 
+                                            th:field="*{mapa.id}" 
+                                            th:classappend="${#fields.hasErrors('mapa')} ? 'is-invalid' : ''"
+                                            required>
+                                        <option value="">Selecciona un mapa...</option>
+                                        <option th:each="mapa : ${mapas}" 
+                                                th:value="${mapa.id}" 
+                                                th:text="${mapa.nombre + ' (' + mapa.ancho + 'x' + mapa.alto + ')'}"></option>
+                                    </select>
+                                    <div th:if="${#fields.hasErrors('mapa')}" class="invalid-feedback">
+                                        <span th:errors="*{mapa}"></span>
+                                    </div>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Selecciona el mapa donde se desarrollará la partida
+                                    </div>
+                                </div>
+
+                                <!-- Fechas -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="fechaInicio" class="form-label">
+                                                <i class="fas fa-calendar me-1 text-muted"></i>
+                                                Fecha y Hora de Inicio <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="datetime-local" 
+                                                   class="form-control" 
+                                                   id="fechaInicio" 
+                                                   th:field="*{fechaInicio}" 
+                                                   th:classappend="${#fields.hasErrors('fechaInicio')} ? 'is-invalid' : ''"
+                                                   required>
+                                            <div th:if="${#fields.hasErrors('fechaInicio')}" class="invalid-feedback">
+                                                <span th:errors="*{fechaInicio}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="fechaFin" class="form-label">
+                                                <i class="fas fa-calendar-check me-1 text-muted"></i>
+                                                Fecha y Hora de Fin
+                                            </label>
+                                            <input type="datetime-local" 
+                                                   class="form-control" 
+                                                   id="fechaFin" 
+                                                   th:field="*{fechaFin}" 
+                                                   th:classappend="${#fields.hasErrors('fechaFin')} ? 'is-invalid' : ''">
+                                            <div th:if="${#fields.hasErrors('fechaFin')}" class="invalid-feedback">
+                                                <span th:errors="*{fechaFin}"></span>
+                                            </div>
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Opcional - Se puede establecer durante la partida
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Estado (solo para edición) -->
+                                <div th:if="${partida.id != null}" class="mb-3">
+                                    <label for="estado" class="form-label">
+                                        <i class="fas fa-info-circle me-1 text-muted"></i>
+                                        Estado
+                                    </label>
+                                    <select class="form-select" 
+                                            id="estado" 
+                                            th:field="*{estado}" 
+                                            th:classappend="${#fields.hasErrors('estado')} ? 'is-invalid' : ''">
+                                        <option th:each="estado : ${T(co.edu.puj.regata.domain.entity.Partida.EstadoPartida).values()}" 
+                                                th:value="${estado}" 
+                                                th:text="${#strings.capitalize(#strings.toLowerCase(estado.name().replace('_', ' ')))}"></option>
+                                    </select>
+                                    <div th:if="${#fields.hasErrors('estado')}" class="invalid-feedback">
+                                        <span th:errors="*{estado}"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Configuración de Duración -->
+                                <div class="mb-3">
+                                    <label for="duracionMaxima" class="form-label">
+                                        <i class="fas fa-clock me-1 text-muted"></i>
+                                        Duración Máxima (minutos)
+                                    </label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           id="duracionMaxima" 
+                                           th:field="*{duracionMaxima}" 
+                                           th:classappend="${#fields.hasErrors('duracionMaxima')} ? 'is-invalid' : ''"
+                                           min="1"
+                                           max="1440"
+                                           placeholder="Ej: 60">
+                                    <div th:if="${#fields.hasErrors('duracionMaxima')}" class="invalid-feedback">
+                                        <span th:errors="*{duracionMaxima}"></span>
+                                    </div>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Tiempo máximo de duración de la partida (1-1440 minutos)
+                                    </div>
+                                </div>
+
+                                <!-- Número máximo de participantes -->
+                                <div class="mb-3">
+                                    <label for="maxParticipantes" class="form-label">
+                                        <i class="fas fa-users me-1 text-muted"></i>
+                                        Máximo de Participantes
+                                    </label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           id="maxParticipantes" 
+                                           th:field="*{maxParticipantes}" 
+                                           th:classappend="${#fields.hasErrors('maxParticipantes')} ? 'is-invalid' : ''"
+                                           min="2"
+                                           max="50"
+                                           placeholder="Ej: 10">
+                                    <div th:if="${#fields.hasErrors('maxParticipantes')}" class="invalid-feedback">
+                                        <span th:errors="*{maxParticipantes}"></span>
+                                    </div>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Número máximo de barcos que pueden participar (2-50)
+                                    </div>
+                                </div>
+
+                                <!-- Botones -->
+                                <div class="d-flex justify-content-between">
+                                    <a th:href="@{/partidas}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-1"></i>Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>
+                                        <span th:text="${partida.id != null ? 'Actualizar Partida' : 'Crear Partida'}"></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información adicional para edición -->
+            <div th:if="${partida.id != null}" class="row mt-4">
+                <div class="col-lg-8 mx-auto">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Información Adicional
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>ID:</strong> <span class="badge bg-secondary" th:text="${partida.id}"></span></p>
+                                    <p><strong>Fecha de Creación:</strong> 
+                                        <span th:if="${partida.fechaCreacion != null}" 
+                                              th:text="${#temporals.format(partida.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Participantes Actuales:</strong> 
+                                        <span class="badge bg-info" th:text="${partida.participaciones != null ? partida.participaciones.size() : 0}"></span>
+                                    </p>
+                                    <p><strong>Estado Actual:</strong> 
+                                        <span th:switch="${partida.estado.name()}">
+                                            <span th:case="'PENDIENTE'" class="badge bg-warning text-dark">Pendiente</span>
+                                            <span th:case="'EN_CURSO'" class="badge bg-primary">En Curso</span>
+                                            <span th:case="'FINALIZADA'" class="badge bg-success">Finalizada</span>
+                                            <span th:case="'CANCELADA'" class="badge bg-danger">Cancelada</span>
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript para validaciones adicionales -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaInicio = document.getElementById('fechaInicio');
+            const fechaFin = document.getElementById('fechaFin');
+            
+            // Validar que la fecha de fin sea posterior a la de inicio
+            function validarFechas() {
+                if (fechaInicio.value && fechaFin.value) {
+                    const inicio = new Date(fechaInicio.value);
+                    const fin = new Date(fechaFin.value);
+                    
+                    if (fin <= inicio) {
+                        fechaFin.setCustomValidity('La fecha de fin debe ser posterior a la fecha de inicio');
+                    } else {
+                        fechaFin.setCustomValidity('');
+                    }
+                }
+            }
+            
+            fechaInicio.addEventListener('change', validarFechas);
+            fechaFin.addEventListener('change', validarFechas);
+            
+            // Establecer fecha mínima como ahora
+            const now = new Date();
+            const minDateTime = now.toISOString().slice(0, 16);
+            fechaInicio.min = minDateTime;
+        });
+    </script>
+</body>
+</html>
