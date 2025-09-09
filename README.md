@@ -4,7 +4,16 @@
 
 Sistema web de regatas online desarrollado en Spring Boot que permite a múltiples jugadores competir en carreras de barcos en tiempo real. Los jugadores controlan barcos que se mueven por vectores de velocidad en un mapa bidimensional con obstáculos.
 
-## 🚀 Versión Actual: 1.0.0
+## 🚀 Versión Actual: 1.2.0
+
+### 📋 Estado Actual del Proyecto
+- ✅ **Backend completo** con Spring Boot
+- ✅ **Sistema de autenticación** implementado
+- ✅ **Gestión de partidas y mapas** funcional
+- ✅ **Interfaz de usuario** con Thymeleaf y Bootstrap
+- ✅ **Base de datos H2** configurada
+- 🔄 **Sistema de turnos** en desarrollo
+- 🔄 **WebSockets** para tiempo real pendiente
 
 ### ✅ Funcionalidades Implementadas
 
@@ -74,20 +83,30 @@ Sistema web de regatas online desarrollado en Spring Boot que permite a múltipl
 
 #### Estructura del Proyecto
 ```
-src/main/java/co/edu/puj/regata/
-├── config/          # Configuración e inicialización
+src/main/java/com/regata/
+├── config/          # Configuración de seguridad e inicialización
+│   ├── SecurityConfig.java
+│   ├── GlobalExceptionHandler.java
+│   └── DataInitializer.java
 ├── domain/
 │   ├── entity/      # Entidades JPA
-│   ├── repo/        # Repositorios
+│   │   ├── Jugador.java
+│   │   ├── Partida.java
+│   │   ├── Mapa.java
+│   │   ├── Celda.java
+│   │   ├── Barco.java
+│   │   └── Participacion.java
+│   ├── repository/  # Repositorios Spring Data
 │   └── service/     # Lógica de negocio
 └── web/
     ├── controller/  # Controladores MVC
-    └── interceptor/ # Interceptores de seguridad
+    └── interceptor/ # Interceptores de autenticación
 
 src/main/resources/
 ├── templates/       # Plantillas Thymeleaf
-├── static/         # Recursos estáticos (CSS, JS)
-└── application.properties
+├── static/         # Recursos estáticos (CSS, JS, imágenes)
+├── application.properties
+└── ValidationMessages.properties
 ```
 
 ### 🚧 Funcionalidades Pendientes
@@ -145,25 +164,35 @@ src/main/resources/
 ### Pasos
 1. **Clonar el repositorio**
    ```bash
-   git clone <repository-url>
-   cd regata-online
+   git clone https://github.com/SantiAvilal13/Proyecto-Desarollo-Web-D.git
+   cd "Proyecto desarrollo web"
    ```
 
 2. **Compilar el proyecto**
    ```bash
-   ./mvnw compile
+   mvn compile
    ```
 
 3. **Ejecutar la aplicación**
    ```bash
-   ./mvnw spring-boot:run
+   mvn spring-boot:run
    ```
 
 4. **Acceder a la aplicación**
-   - URL: http://localhost:8080/regata
+   - URL: http://localhost:8080
    - Usuarios de prueba:
      - **Administrador**: admin / admin123
      - **Jugador**: player1 / player123
+
+### 🔧 Tecnologías Utilizadas
+- **Java 17**
+- **Spring Boot 3.2.0**
+- **Spring Security** para autenticación
+- **Spring Data JPA** para persistencia
+- **H2 Database** (base de datos en memoria)
+- **Thymeleaf** para templates
+- **Bootstrap 5** para estilos
+- **Maven** para gestión de dependencias
 
 ## 🎯 Casos de Uso Principales
 
@@ -196,4 +225,11 @@ Proyecto académico - Pontificia Universidad Javeriana
 ---
 
 **Estado del Proyecto**: ✅ Funcional - En desarrollo activo
-**Última Actualización**: Agosto 2025
+**Última Actualización**: Enero 2025
+**Repositorio**: https://github.com/SantiAvilal13/Proyecto-Desarollo-Web-D.git
+
+## 👥 Desarrolladores
+- Santiago Ávila - Desarrollo Full Stack
+
+## 📞 Contacto
+Para consultas sobre el proyecto, contactar a través del repositorio de GitHub.
