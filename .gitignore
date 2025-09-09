@@ -1,0 +1,193 @@
+# ===============================
+# GITIGNORE PARA PROYECTO REGATA ONLINE
+# ===============================
+
+# Archivos compilados de Java
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# Archivos de log
+*.log
+logs/
+
+# Archivos temporales
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ===============================
+# MAVEN
+# ===============================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ===============================
+# SPRING BOOT
+# ===============================
+*.pid
+spring-shell.log
+
+# ===============================
+# BASE DE DATOS H2
+# ===============================
+*.db
+*.h2.db
+*.mv.db
+*.trace.db
+
+# ===============================
+# IDEs
+# ===============================
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# ===============================
+# SISTEMA OPERATIVO
+# ===============================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===============================
+# NODE.JS (si se usa para frontend)
+# ===============================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+.npm
+.eslintcache
+.node_repl_history
+*.tgz
+*.tar.gz
+.yarn-integrity
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ===============================
+# ARCHIVOS DE CONFIGURACIÓN SENSIBLES
+# ===============================
+.env
+*.env
+config/secrets.yml
+config/database.yml
+application-local.properties
+application-dev.properties
+application-prod.properties
+
+# ===============================
+# ARCHIVOS DE BACKUP
+# ===============================
+*.bak
+*.backup
+*.old
+*.orig
+
+# ===============================
+# ARCHIVOS DE DOCUMENTACIÓN GENERADOS
+# ===============================
+/docs/build/
+/docs/dist/
+
+# ===============================
+# ARCHIVOS DE TESTING
+# ===============================
+/test-results/
+/coverage/
+*.lcov
+
+# ===============================
+# ARCHIVOS ESPECÍFICOS DEL PROYECTO
+# ===============================
+
+# Archivos de configuración local del desarrollador
+/app/src/main/resources/application-local.properties
+
+# Archivos de datos de prueba
+/data/
+/uploads/
+
+# Archivos de cache
+.cache/
+
+# Archivos de build personalizados
+/build/
+/dist/
