@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::head}, ~{::contenido})}">
+<head>
+    <title th:text="'Jugando: ' + ${partida.nombre} + ' - Regata'">Jugar Partida - Regata</title>
+    <style>
+        .mapa-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .celda {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #dee2e6;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .celda:hover {
+            background-color: #e3f2fd;
+            transform: scale(1.1);
+        }
+        .celda.agua {
+            background-color: #e3f2fd;
+        }
+        .celda.tierra {
+            background-color: #8d6e63;
+        }
+        .celda.salida {
+            background-color: #4caf50;
+            color: white;
+        }
+        .celda.meta {
+            background-color: #f44336;
+            color: white;
+        }
+        .celda.jugador {
+            background-color: #2196f3;
+            color: white;
+            font-weight: bold;
+        }
+        .celda.movimiento-valido {
+            background-color: #ffeb3b;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        .turno-actual {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .participante-info {
+            transition: transform 0.2s;
+        }
+        .participante-info:hover {
+            transform: translateY(-2px);
+        }
+        .mapa-row {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+    <script th:inline="javascript">
+        const participantes = /*[[${participantes}]]*/ [];
+        const partidaId = /*[[${partida.id}]]*/ 0;
+        
+        // Dibujar participantes en el mapa
+        function dibujarParticipantes() {
+            // Limpiar jugadores anteriores
+            document.querySelectorAll('.celda.jugador').forEach(celda => {
+                celda.classList.remove('jugador');
+                if (!celda.textContent.includes('S') && !celda.textContent.includes('M')) {
+                    celda.textContent = '';
+                }
+            });
+            
+            // Dibujar participantes actuales
+            participantes.forEach(participante => {
+                const celda = document.getElementById(`celda-${participante.posicionX}-${participante.posicionY}`);
+                if (celda) {
+                    celda.classList.add('jugador');
+                    celda.textContent = participante.ordenTurno;
+                }
+            });
+        }
+        
+        function mover(deltaX, deltaY) {
+            const jugadorId = document.getElementById('jugadorSelect').value;
+            if (!jugadorId) {
+                alert('Por favor selecciona tu jugador');
+                return;
+            }
+            
+            const participante = participantes.find(p => p.jugador.id == jugadorId);
+            if (!participante) {
+                alert('Jugador no encontrado');
+                return;
+            }
+            
+            const nuevaX = participante.posicionX + deltaX;
+            const nuevaY = participante.posicionY + deltaY;
+            
+            moverACelda(nuevaX, nuevaY);
+        }
+        
+        function moverACelda(x, y) {
+            const jugadorId = document.getElementById('jugadorSelect').value;
+            if (!jugadorId) {
+                alert('Por favor selecciona tu jugador');
+                return;
+            }
+            
+            // Validar límites del mapa
+            if (x < 0 || y < 0 || x >= /*[[${partida.mapa.ancho}]]*/ 10 || y >= /*[[${partida.mapa.alto}]]*/ 10) {
+                alert('Movimiento fuera del mapa');
+                return;
+            }
+            
+            // Crear formulario para enviar el movimiento
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/partidas/${partidaId}/mover`;
+            
+            const jugadorInput = document.createElement('input');
+            jugadorInput.type = 'hidden';
+            jugadorInput.name = 'jugadorId';
+            jugadorInput.value = jugadorId;
+            
+            const xInput = document.createElement('input');
+            xInput.type = 'hidden';
+            xInput.name = 'nuevaX';
+            xInput.value = x;
+            
+            const yInput = document.createElement('input');
+            yInput.type = 'hidden';
+            yInput.name = 'nuevaY';
+            yInput.value = y;
+            
+            form.appendChild(jugadorInput);
+            form.appendChild(xInput);
+            form.appendChild(yInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+        
+        function mostrarPosicionesValidas() {
+            const jugadorId = document.getElementById('jugadorSelect').value;
+            if (!jugadorId) {
+                alert('Por favor selecciona tu jugador');
+                return;
+            }
+            
+            const participante = participantes.find(p => p.jugador.id == jugadorId);
+            if (!participante) {
+                return;
+            }
+            
+            // Limpiar movimientos válidos anteriores
+            document.querySelectorAll('.celda.movimiento-valido').forEach(celda => {
+                celda.classList.remove('movimiento-valido');
+            });
+            
+            // Mostrar movimientos válidos (adyacentes)
+            const movimientos = [
+                {x: participante.posicionX - 1, y: participante.posicionY},
+                {x: participante.posicionX + 1, y: participante.posicionY},
+                {x: participante.posicionX, y: participante.posicionY - 1},
+                {x: participante.posicionX, y: participante.posicionY + 1}
+            ];
+            
+            movimientos.forEach(mov => {
+                if (mov.x >= 0 && mov.y >= 0 && 
+                    mov.x < /*[[${partida.mapa.ancho}]]*/ 10 && 
+                    mov.y < /*[[${partida.mapa.alto}]]*/ 10) {
+                    const celda = document.getElementById(`celda-${mov.x}-${mov.y}`);
+                    if (celda) {
+                        celda.classList.add('movimiento-valido');
+                    }
+                }
+            });
+        }
+        
+        // Inicializar el mapa
+        document.addEventListener('DOMContentLoaded', function() {
+            dibujarParticipantes();
+        });
+    </script>
+</head>
+<body>
+    <div th:fragment="contenido" class="container-fluid mt-4">
+        <!-- Alertas -->
+        <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje} + ' alert-dismissible fade show'" role="alert">
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Encabezado -->
+        <div class="text-center mb-4">
+            <h1 th:text="${partida.nombre}">Nombre de la Partida</h1>
+            <div class="d-flex justify-content-center align-items-center gap-3">
+                <span class="badge bg-success fs-6">En Juego</span>
+                <span class="badge bg-primary fs-6" th:text="'Turno ' + ${partida.turnoActual}">Turno 1</span>
+                <a th:href="@{/partidas/{id}(id=${partida.id})}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-info-circle me-1"></i>Detalles
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Panel de Participantes -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-users me-2"></i>Participantes</h5>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="mb-2" th:each="participante : ${participantes}">
+                            <div class="card participante-info" 
+                                 th:class="'card participante-info ' + (${participante.ordenTurno == partida.turnoActual} ? 'turno-actual' : '')">
+                                <div class="card-body p-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-2">
+                                            <i class="fas fa-sailboat" th:if="${participante.ordenTurno == partida.turnoActual}"></i>
+                                            <i class="fas fa-user-circle text-muted" th:unless="${participante.ordenTurno == partida.turnoActual}"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-0 small" th:text="${participante.jugador.nombre}">Jugador</h6>
+                                            <small class="text-muted" th:text="${participante.barco.nombre}">Barco</small>
+                                            <div class="small">
+                                                <i class="fas fa-map-marker-alt me-1"></i>
+                                                (<span th:text="${participante.posicionX}">0</span>, <span th:text="${participante.posicionY}">0</span>)
+                                            </div>
+                                            <span class="badge bg-warning" th:if="${participante.haLlegadoMeta}">¡Meta!</span>
+                                        </div>
+                                        <div th:if="${participante.ordenTurno == partida.turnoActual}">
+                                            <i class="fas fa-clock text-warning"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controles -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6><i class="fas fa-gamepad me-2"></i>Controles</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="jugadorSelect" class="form-label small">Tu Jugador:</label>
+                            <select class="form-select form-select-sm" id="jugadorSelect">
+                                <option value="">Seleccionar...</option>
+                                <option th:each="participante : ${participantes}" 
+                                        th:value="${participante.jugador.id}" 
+                                        th:text="${participante.jugador.nombre}">Jugador</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small">Movimiento:</label>
+                            <div class="row g-1">
+                                <div class="col-4">
+                                    <button class="btn btn-outline-primary btn-sm w-100" onclick="mover(0, -1)">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </button>
+                                </div>
+                                <div class="col-4"></div>
+                                <div class="col-4"></div>
+                                <div class="col-4">
+                                    <button class="btn btn-outline-primary btn-sm w-100" onclick="mover(-1, 0)">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn btn-outline-secondary btn-sm w-100" onclick="mostrarPosicionesValidas()">
+                                        <i class="fas fa-crosshairs"></i>
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn btn-outline-primary btn-sm w-100" onclick="mover(1, 0)">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                                <div class="col-4"></div>
+                                <div class="col-4">
+                                    <button class="btn btn-outline-primary btn-sm w-100" onclick="mover(0, 1)">
+                                        <i class="fas fa-arrow-down"></i>
+                                    </button>
+                                </div>
+                                <div class="col-4"></div>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-warning btn-sm" onclick="location.reload()">
+                                <i class="fas fa-sync-alt me-1"></i>Actualizar
+                            </button>
+                            <form th:action="@{/partidas/{id}/terminar(id=${partida.id})}" method="post" class="d-grid">
+                                <button type="submit" class="btn btn-danger btn-sm" 
+                                        onclick="return confirm('¿Estás seguro de que quieres terminar la partida?')">
+                                    <i class="fas fa-stop me-1"></i>Terminar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leyenda -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6><i class="fas fa-info-circle me-2"></i>Leyenda</h6>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="d-flex align-items-center mb-1">
+                            <div class="celda agua me-2" style="width: 20px; height: 20px;"></div>
+                            <small>Agua</small>
+                        </div>
+                        <div class="d-flex align-items-center mb-1">
+                            <div class="celda tierra me-2" style="width: 20px; height: 20px;"></div>
+                            <small>Tierra</small>
+                        </div>
+                        <div class="d-flex align-items-center mb-1">
+                            <div class="celda salida me-2" style="width: 20px; height: 20px;">S</div>
+                            <small>Salida</small>
+                        </div>
+                        <div class="d-flex align-items-center mb-1">
+                            <div class="celda meta me-2" style="width: 20px; height: 20px;">M</div>
+                            <small>Meta</small>
+                        </div>
+                        <div class="d-flex align-items-center mb-1">
+                            <div class="celda jugador me-2" style="width: 20px; height: 20px;">1</div>
+                            <small>Jugador</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mapa de Juego -->
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h5><i class="fas fa-map me-2"></i>Mapa: <span th:text="${partida.mapa.nombre}">Nombre del Mapa</span></h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mapa-container">
+                            <div th:each="y : ${#numbers.sequence(0, partida.mapa.alto - 1)}" class="mapa-row">
+                                <div th:each="x : ${#numbers.sequence(0, partida.mapa.ancho - 1)}" 
+                                     class="celda agua"
+                                     th:id="'celda-' + ${x} + '-' + ${y}"
+                                     th:onclick="'moverACelda(' + ${x} + ', ' + ${y} + ')'"
+                                     th:class="'celda ' + 
+                                             (${x == partida.salidaX and y == partida.salidaY} ? 'salida' : 
+                                              ${x == partida.metaX and y == partida.metaY} ? 'meta' : 'agua')"
+                                     th:text="${x == partida.salidaX and y == partida.salidaY} ? 'S' : 
+                                             (${x == partida.metaX and y == partida.metaY} ? 'M' : '')"
+                                     th:data-x="${x}"
+                                     th:data-y="${y}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

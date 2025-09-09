@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::head}, ~{::contenido})}">
+<head>
+    <style>
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .detail-value {
+            color: #212529;
+        }
+        .warning-card {
+            border-left: 5px solid #dc3545;
+        }
+        .color-display {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #dee2e6;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .boat-preview {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #f44336;
+        }
+        .boat-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            opacity: 0.7;
+        }
+        .position-display {
+            background-color: #ffebee;
+            border: 2px solid #f44336;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="contenido">
+        <!-- Contenido principal -->
+        <div class="container mt-4">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="/barcos">Barcos</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/barcos/{id}(id=${barco.id})}" th:text="'Barco #' + ${barco.id}"></a></li>
+                    <li class="breadcrumb-item active">Eliminar</li>
+                </ol>
+            </nav>
+
+            <!-- Encabezado -->
+            <div class="mb-4">
+                <h1 class="text-danger">
+                    <i class="fas fa-anchor me-2"></i>
+                    <span th:text="'Eliminar Barco #' + ${barco.id}"></span>
+                </h1>
+                <p class="text-muted">¿Estás seguro de que deseas eliminar este barco?</p>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <!-- Advertencia -->
+                    <div class="alert alert-danger warning-card" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>¡Atención!</strong> Esta acción no se puede deshacer. Al eliminar este barco:
+                        <ul class="mt-2 mb-0">
+                            <li>Se perderá toda la información del barco</li>
+                            <li>El jugador <strong th:text="${barco.jugador.nombre}"></strong> perderá esta embarcación</li>
+                            <li>La posición <strong th:text="'(' + ${barco.posX} + ', ' + ${barco.posY} + ')'"></strong> quedará libre en el mapa</li>
+                            <li>Esta acción es permanente e irreversible</li>
+                        </ul>
+                    </div>
+
+                    <!-- Vista previa del barco -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="boat-preview">
+                                <div class="boat-icon" th:style="'color: ' + ${barco.modelo.color}">
+                                    <i class="fas fa-ship"></i>
+                                </div>
+                                <h5 th:text="'Barco #' + ${barco.id}"></h5>
+                                <p class="mb-0 text-muted">Será eliminado permanentemente</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información del barco -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Información del Barco a Eliminar
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <span class="detail-label">ID del Barco:</span>
+                                </div>
+                                <div class="col-sm-8">
+                                    <span class="detail-value" th:text="${barco.id}"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <span class="detail-label">Propietario:</span>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="detail-value">
+                                        <i class="fas fa-user me-2"></i>
+                                        <strong th:text="${barco.jugador.nombre}"></strong>
+                                        <br>
+                                        <small class="text-muted" th:text="${barco.jugador.email}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <span class="detail-label">Modelo:</span>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="detail-value">
+                                        <i class="fas fa-cog me-2"></i>
+                                        <span th:text="${barco.modelo.nombre}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <span class="detail-label">Color:</span>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="detail-value d-flex align-items-center">
+                                        <div class="color-display" th:style="'background-color: ' + ${barco.modelo.color}"></div>
+                                        <span th:text="${barco.modelo.color}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <span class="detail-label">Posición:</span>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="position-display">
+                                        <i class="fas fa-map-marker-alt me-2"></i>
+                                        <span th:text="'X: ' + ${barco.posX} + ', Y: ' + ${barco.posY}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Impacto en el propietario -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h6 class="mb-0 text-warning">
+                                <i class="fas fa-user-times me-2"></i>Impacto en el Propietario
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning mb-0">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user fa-2x text-warning me-3"></i>
+                                    <div>
+                                        <strong th:text="${barco.jugador.nombre}"></strong> perderá este barco.
+                                        <br>
+                                        <small class="text-muted">
+                                            El jugador podrá crear nuevos barcos en el futuro, pero este barco específico 
+                                            y su posición actual se perderán permanentemente.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulario de confirmación -->
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <form th:action="@{/barcos/{id}/eliminar(id=${barco.id})}" method="post">
+                                <div class="d-flex justify-content-between">
+                                    <a th:href="@{/barcos/{id}(id=${barco.id})}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-trash me-2"></i>Confirmar Eliminación
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Información adicional -->
+                    <div class="mt-4">
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Alternativas:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Si solo necesitas cambiar la posición, considera <a th:href="@{/barcos/{id}/editar(id=${barco.id})}">editar el barco</a></li>
+                                <li>Si quieres transferir el barco a otro jugador, puedes editarlo y cambiar el propietario</li>
+                                <li>Si el problema es el modelo, puedes cambiarlo sin eliminar el barco</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

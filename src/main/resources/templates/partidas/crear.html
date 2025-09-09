@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::head}, ~{::contenido})}">
+<head>
+    <title>Crear Partida - Regata</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('autoConfig').addEventListener('change', function() {
+                const posicionesManual = document.getElementById('posicionesManual');
+                if (this.checked) {
+                    posicionesManual.style.display = 'none';
+                    // Limpiar valores manuales
+                    document.querySelector('input[name="salidaX"]').value = '';
+                    document.querySelector('input[name="salidaY"]').value = '';
+                    document.querySelector('input[name="metaX"]').value = '';
+                    document.querySelector('input[name="metaY"]').value = '';
+                } else {
+                    posicionesManual.style.display = 'block';
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div th:fragment="contenido">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-plus me-2"></i>Crear Nueva Partida</h4>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/partidas/crear}" th:object="${partida}" method="post">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="nombre" class="form-label">
+                                            <i class="fas fa-tag me-2"></i>Nombre de la Partida *
+                                        </label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               th:field="*{nombre}" 
+                                               id="nombre" 
+                                               placeholder="Ej: Regata del Caribe"
+                                               required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="mapa" class="form-label">
+                                            <i class="fas fa-map me-2"></i>Mapa *
+                                        </label>
+                                        <select class="form-select" th:field="*{mapa.id}" id="mapa" required>
+                                            <option value="">Seleccionar mapa...</option>
+                                            <option th:each="mapa : ${mapas}" 
+                                                    th:value="${mapa.id}" 
+                                                    th:text="${mapa.nombre + ' (' + mapa.ancho + 'x' + mapa.alto + ')'}">Mapa</option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('mapa')}" th:errors="*{mapa}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="maxJugadores" class="form-label">
+                                            <i class="fas fa-users me-2"></i>Máximo de Jugadores *
+                                        </label>
+                                        <select class="form-select" th:field="*{maxJugadores}" id="maxJugadores" required>
+                                            <option value="2">2 jugadores</option>
+                                            <option value="3">3 jugadores</option>
+                                            <option value="4" selected>4 jugadores</option>
+                                            <option value="5">5 jugadores</option>
+                                            <option value="6">6 jugadores</option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('maxJugadores')}" th:errors="*{maxJugadores}"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-cog me-2"></i>Configuración Automática
+                                        </label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="autoConfig" checked>
+                                            <label class="form-check-label" for="autoConfig">
+                                                Configurar posiciones automáticamente
+                                            </label>
+                                        </div>
+                                        <small class="text-muted">Las posiciones de salida y meta se configurarán automáticamente</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" id="posicionesManual" style="display: none;">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-play me-2"></i>Posición de Salida
+                                        </label>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <input type="number" 
+                                                       class="form-control" 
+                                                       th:field="*{salidaX}" 
+                                                       placeholder="X" 
+                                                       min="0">
+                                            </div>
+                                            <div class="col-6">
+                                                <input type="number" 
+                                                       class="form-control" 
+                                                       th:field="*{salidaY}" 
+                                                       placeholder="Y" 
+                                                       min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-flag-checkered me-2"></i>Posición de Meta
+                                        </label>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <input type="number" 
+                                                       class="form-control" 
+                                                       th:field="*{metaX}" 
+                                                       placeholder="X" 
+                                                       min="0">
+                                            </div>
+                                            <div class="col-6">
+                                                <input type="number" 
+                                                       class="form-control" 
+                                                       th:field="*{metaY}" 
+                                                       placeholder="Y" 
+                                                       min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Información:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>La partida se creará en estado "Esperando jugadores"</li>
+                                    <li>Los jugadores podrán unirse seleccionando su barco</li>
+                                    <li>La partida iniciará cuando se alcance el mínimo de 2 jugadores</li>
+                                    <li>Todos los jugadores comenzarán desde la misma posición de salida</li>
+                                </ul>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a href="/partidas" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save me-2"></i>Crear Partida
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

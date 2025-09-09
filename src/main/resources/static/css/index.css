@@ -1,0 +1,15 @@
+/* Estilos específicos para la página de inicio */
+
+/* Sección hero */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4rem 0;
+    margin-bottom: 3rem;
+}
+
+/* Tarjetas de estadísticas */
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}

@@ -1,0 +1,122 @@
+/* Estilos para el formulario de modelos */
+
+/* Navegación */
+.navbar-brand {
+    font-weight: bold;
+    color: #0066cc !important;
+}
+
+/* Tarjetas */
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones */
+.btn-primary {
+    background-color: #0066cc;
+    border-color: #0066cc;
+}
+
+.btn-primary:hover {
+    background-color: #0052a3;
+    border-color: #0052a3;
+}
+
+/* Formularios */
+.form-label {
+    font-weight: 500;
+}
+
+.required {
+    color: #dc3545;
+}
+
+/* Selector de color */
+.color-preview {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #dee2e6;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.color-suggestions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #dee2e6;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    border-color: #0066cc;
+}
+
+.color-option.selected {
+    border-color: #0066cc;
+    border-width: 3px;
+    transform: scale(1.1);
+}
+
+/* Mensajes de error personalizados */
+.color-error {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Indicador de color */
+.color-indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #dee2e6;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+/* Badge de color (alias para color-indicator) */
+.color-badge {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #dee2e6;
+    margin-right: 8px;
+}
+
+/* Display de color (para páginas de eliminación) */
+.color-display {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #dee2e6;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .color-suggestions {
+        justify-content: center;
+    }
+    
+    .color-preview {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .color-option {
+        width: 25px;
+        height: 25px;
+    }
+}

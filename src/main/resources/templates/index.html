@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout :: layout(~{::head}, ~{::contenido})">
+<head th:fragment="head">
+    <title>Inicio - Regata Online</title>
+</head>
+<body>
+    <div th:fragment="contenido">
+        <!-- Sección Hero -->
+        <div class="hero-section">
+            <div class="container text-center">
+                <h1 class="display-4 mb-4">
+                    <i class="fas fa-ship me-3"></i>Bienvenido a Regata Online
+                </h1>
+                <p class="lead mb-4">Sistema de gestión para regatas y competencias náuticas</p>
+                <a href="/mapas" class="btn btn-light btn-lg me-3">
+                        <i class="fas fa-map me-2"></i>Ver Mapa
+                    </a>
+                <a href="/jugadores" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-users me-2"></i>Gestionar Jugadores
+                </a>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="container">
+            <!-- Estadísticas -->
+            <div class="row mb-5">
+                <div class="col-md-3 mb-4">
+                    <div class="card stat-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-users fa-3x mb-3"></i>
+                            <h3 th:text="${totalJugadores}">0</h3>
+                            <p class="card-text">Jugadores</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="card stat-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-cogs fa-3x mb-3"></i>
+                            <h3 th:text="${totalModelos}">0</h3>
+                            <p class="card-text">Modelos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="card stat-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-anchor fa-3x mb-3"></i>
+                            <h3 th:text="${totalBarcos}">0</h3>
+                            <p class="card-text">Barcos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="card stat-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-map fa-3x mb-3"></i>
+                            <h3 th:text="${totalMapas}">0</h3>
+                            <p class="card-text">Mapas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estadísticas de Partidas -->
+            <div class="row mb-5">
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                         <div class="card-body">
+                             <i class="fas fa-clock fa-3x mb-3"></i>
+                             <h3 th:text="${partidasEsperando}">0</h3>
+                             <p class="card-text">Partidas Esperando</p>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-md-4 mb-4">
+                     <div class="card text-center" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                         <div class="card-body">
+                             <i class="fas fa-play fa-3x mb-3"></i>
+                             <h3 th:text="${partidasEnJuego}">0</h3>
+                             <p class="card-text">Partidas En Juego</p>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-md-4 mb-4">
+                     <div class="card text-center" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+                         <div class="card-body">
+                             <i class="fas fa-trophy fa-3x mb-3"></i>
+                             <h3 th:text="${partidasTerminadas}">0</h3>
+                             <p class="card-text">Partidas Terminadas</p>
+                         </div>
+                     </div>
+                </div>
+            </div>
+
+            <!-- Acciones rápidas -->
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-plus-circle me-2"></i>Acciones Rápidas
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="/jugadores/nuevo" class="btn btn-outline-primary">
+                                    <i class="fas fa-user-plus me-2"></i>Nuevo Jugador
+                                </a>
+                                <a href="/modelos/nuevo" class="btn btn-outline-primary">
+                                    <i class="fas fa-plus me-2"></i>Nuevo Modelo
+                                </a>
+                                <a href="/barcos/crear" class="btn btn-outline-primary">
+                                    <i class="fas fa-ship me-2"></i>Nuevo Barco
+                                </a>
+                                <a href="/partidas/crear" class="btn btn-success">
+                                    <i class="fas fa-gamepad me-2"></i>Nueva Partida
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Información del Sistema
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">Sistema de gestión para regatas online que permite:</p>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Gestión de jugadores</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Administración de modelos de barcos</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Control de flota de barcos</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Visualización de mapas de regata</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CSS específico para index -->
+        <link th:href="@{/css/index.css}" rel="stylesheet">
+    </div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout :: layout(~{::head}, ~{::contenido})">
+<head th:fragment="head">
+    <title>Editar Jugador - Regata Online</title>
+</head>
+<body>
+    <div th:fragment="contenido">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/jugadores">Jugadores</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/jugadores/{id}(id=${jugador.id})}" th:text="${jugador.nombre}"></a></li>
+                <li class="breadcrumb-item active">Editar</li>
+            </ol>
+        </nav>
+
+        <!-- Encabezado -->
+        <div class="mb-4">
+            <h1><i class="fas fa-user-edit me-2"></i>Editar Jugador</h1>
+            <p class="text-muted">Modifica la información del jugador <strong th:text="${jugador.nombre}"></strong></p>
+        </div>
+
+        <!-- Formulario -->
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <form th:action="@{/jugadores/{id}(id=${jugador.id})}" th:object="${jugador}" method="post">
+                            <!-- ID oculto -->
+                            <input type="hidden" th:field="*{id}">
+                            
+                            <!-- Nombre -->
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">
+                                    Nombre <span class="required">*</span>
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="nombre" 
+                                       th:field="*{nombre}"
+                                       th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''"
+                                       placeholder="Ingresa el nombre del jugador"
+                                       required>
+                                <div th:if="${#fields.hasErrors('nombre')}" class="invalid-feedback">
+                                    <span th:errors="*{nombre}"></span>
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="mb-3">
+                                <label for="email" class="form-label">
+                                    Email <span class="required">*</span>
+                                </label>
+                                <input type="email" 
+                                       class="form-control" 
+                                       id="email" 
+                                       th:field="*{email}"
+                                       th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                                       placeholder="ejemplo@correo.com"
+                                       required>
+                                <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback">
+                                    <span th:errors="*{email}"></span>
+                                </div>
+                                <div class="form-text">
+                                    El email debe ser único en el sistema
+                                </div>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/jugadores/{id}(id=${jugador.id})}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Actualizar Jugador
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Información:</strong> Los campos marcados con <span class="required">*</span> son obligatorios.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

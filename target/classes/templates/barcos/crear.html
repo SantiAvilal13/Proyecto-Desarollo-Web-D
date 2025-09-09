@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout :: layout(~{::head}, ~{::contenido})">
+<head th:fragment="head">
+    <title>Crear Barco - Regata Online</title>
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+            color: #0066cc !important;
+        }
+        .card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #0066cc;
+            border-color: #0066cc;
+        }
+        .btn-primary:hover {
+            background-color: #0052a3;
+            border-color: #0052a3;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .required {
+            color: #dc3545;
+        }
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #dee2e6;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        .model-option {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+        .model-option:hover {
+            background-color: #f8f9fa;
+        }
+        .position-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        .position-cell {
+            aspect-ratio: 1;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .position-cell:hover {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .position-cell.selected {
+            background-color: #2196f3;
+            color: white;
+            border-color: #1976d2;
+        }
+        .position-cell.occupied {
+            background-color: #ffebee;
+            border-color: #f44336;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="contenido">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/barcos">Barcos</a></li>
+                <li class="breadcrumb-item active">Crear</li>
+            </ol>
+        </nav>
+
+        <!-- Encabezado -->
+        <div class="mb-4">
+            <h1><i class="fas fa-anchor me-2"></i>Crear Nuevo Barco</h1>
+            <p class="text-muted">Registra un nuevo barco en la regata</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <!-- Formulario -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plus-circle me-2"></i>Información del Barco
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/barcos}" method="post" th:object="${barco}">
+                            <!-- Propietario -->
+                            <div class="mb-3">
+                                <label for="jugadorId" class="form-label">
+                                    <i class="fas fa-user me-1"></i>Propietario <span class="required">*</span>
+                                </label>
+                                <select class="form-select" id="jugadorId" name="jugadorId" required>
+                                    <option value="">Selecciona un jugador...</option>
+                                    <option th:each="jugador : ${jugadores}" 
+                                            th:value="${jugador.id}" 
+                                            th:text="${jugador.nombre + ' (' + jugador.email + ')'}"
+                                            th:selected="${barco.jugador != null and barco.jugador.id == jugador.id}"></option>
+                                </select>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Selecciona el jugador propietario del barco
+                                </div>
+                                <div th:if="${#fields.hasErrors('jugador')}" class="text-danger small">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    <span th:errors="*{jugador}"></span>
+                                </div>
+                            </div>
+
+                            <!-- Modelo -->
+                            <div class="mb-3">
+                                <label for="modeloId" class="form-label">
+                                    <i class="fas fa-cog me-1"></i>Modelo <span class="required">*</span>
+                                </label>
+                                <select class="form-select" id="modeloId" name="modeloId" required>
+                                    <option value="">Selecciona un modelo...</option>
+                                    <option th:each="modelo : ${modelos}" 
+                                            th:value="${modelo.id}" 
+                                            th:text="${modelo.nombre}"
+                                            th:data-color="${modelo.color}"
+                                            th:selected="${barco.modelo != null and barco.modelo.id == modelo.id}"></option>
+                                </select>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Selecciona el modelo del barco
+                                    <span id="colorPreview" class="color-preview" style="display: none;"></span>
+                                </div>
+                                <div th:if="${#fields.hasErrors('modelo')}" class="text-danger small">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    <span th:errors="*{modelo}"></span>
+                                </div>
+                            </div>
+
+                            <!-- Posición X -->
+                            <div class="mb-3">
+                                <label for="posX" class="form-label">
+                                    <i class="fas fa-arrows-alt-h me-1"></i>Posición X <span class="required">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="posX" th:field="*{posX}" 
+                                       min="0" max="99" required>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Coordenada horizontal (0-99)
+                                </div>
+                                <div th:if="${#fields.hasErrors('posX')}" class="text-danger small">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    <span th:errors="*{posX}"></span>
+                                </div>
+                            </div>
+
+                            <!-- Posición Y -->
+                            <div class="mb-3">
+                                <label for="posY" class="form-label">
+                                    <i class="fas fa-arrows-alt-v me-1"></i>Posición Y <span class="required">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="posY" th:field="*{posY}" 
+                                       min="0" max="99" required>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Coordenada vertical (0-99)
+                                </div>
+                                <div th:if="${#fields.hasErrors('posY')}" class="text-danger small">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    <span th:errors="*{posY}"></span>
+                                </div>
+                            </div>
+
+                            <!-- Velocidad X -->
+                            <div class="mb-3">
+                                <label for="velX" class="form-label">
+                                    <i class="fas fa-tachometer-alt me-1"></i>Velocidad X <span class="required">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="velX" th:field="*{velX}" 
+                                       min="-10" max="10" value="0" required>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Velocidad horizontal (-10 a 10)
+                                </div>
+                                <div th:if="${#fields.hasErrors('velX')}" class="text-danger small">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    <span th:errors="*{velX}"></span>
+                                </div>
+                            </div>
+
+                            <!-- Velocidad Y -->
+                            <div class="mb-3">
+                                <label for="velY" class="form-label">
+                                    <i class="fas fa-tachometer-alt me-1"></i>Velocidad Y <span class="required">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="velY" th:field="*{velY}" 
+                                       min="-10" max="10" value="0" required>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Velocidad vertical (-10 a 10)
+                                </div>
+                                <div th:if="${#fields.hasErrors('velY')}" class="text-danger small">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    <span th:errors="*{velY}"></span>
+                                </div>
+                            </div>
+
+                            <!-- Selector visual de posición -->
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-map-marker-alt me-1"></i>Selector Visual de Posición
+                                </label>
+                                <div class="position-grid" id="positionGrid">
+                                    <!-- Se generará dinámicamente con JavaScript -->
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Haz clic en una celda para seleccionar la posición
+                                    <span class="ms-3">
+                                        <span class="badge bg-primary">Seleccionada</span>
+                                        <span class="badge bg-danger ms-1">Ocupada</span>
+                                        <span class="badge bg-light text-dark ms-1">Disponible</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="d-flex justify-content-between">
+                                <a href="/barcos" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Crear Barco
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="mt-4">
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Consejos:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Asegúrate de que la posición no esté ocupada por otro barco</li>
+                            <li>Las coordenadas van de 0 a 99 en ambos ejes</li>
+                            <li>Cada jugador puede tener múltiples barcos</li>
+                            <li>El color del barco depende del modelo seleccionado</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Mostrar preview del color del modelo
+            document.getElementById('modeloId').addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const colorPreview = document.getElementById('colorPreview');
+                
+                if (selectedOption.value && selectedOption.dataset.color) {
+                    colorPreview.style.backgroundColor = selectedOption.dataset.color;
+                    colorPreview.style.display = 'inline-block';
+                } else {
+                    colorPreview.style.display = 'none';
+                }
+            });
+
+            // Generar grilla de posiciones (simplificada para demo)
+            function generatePositionGrid() {
+                const grid = document.getElementById('positionGrid');
+                const gridSize = 10; // 10x10 para demo
+                
+                for (let y = 0; y < gridSize; y++) {
+                    for (let x = 0; x < gridSize; x++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'position-cell';
+                        cell.textContent = `${x},${y}`;
+                        cell.dataset.x = x;
+                        cell.dataset.y = y;
+                        
+                        cell.addEventListener('click', function() {
+                            // Remover selección anterior
+                            document.querySelectorAll('.position-cell.selected').forEach(c => {
+                                c.classList.remove('selected');
+                            });
+                            
+                            // Seleccionar nueva celda
+                            this.classList.add('selected');
+                            
+                            // Actualizar inputs
+                            document.getElementById('posX').value = this.dataset.x;
+                            document.getElementById('posY').value = this.dataset.y;
+                        });
+                        
+                        grid.appendChild(cell);
+                    }
+                }
+            }
+
+            // Sincronizar inputs con grilla
+            function syncGridWithInputs() {
+                const posX = document.getElementById('posX');
+                const posY = document.getElementById('posY');
+                
+                function updateGrid() {
+                    const x = parseInt(posX.value);
+                    const y = parseInt(posY.value);
+                    
+                    // Remover selección anterior
+                    document.querySelectorAll('.position-cell.selected').forEach(c => {
+                        c.classList.remove('selected');
+                    });
+                    
+                    // Seleccionar nueva celda si está en rango
+                    if (x >= 0 && x < 10 && y >= 0 && y < 10) {
+                        const cell = document.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+                        if (cell) {
+                            cell.classList.add('selected');
+                        }
+                    }
+                }
+                
+                posX.addEventListener('input', updateGrid);
+                posY.addEventListener('input', updateGrid);
+            }
+
+            // Inicializar cuando se carga la página
+            document.addEventListener('DOMContentLoaded', function() {
+                generatePositionGrid();
+                syncGridWithInputs();
+            });
+        </script>
+    </div>
+</body>
+</html>

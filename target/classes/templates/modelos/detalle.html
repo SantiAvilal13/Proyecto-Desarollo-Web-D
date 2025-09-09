@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout :: layout(~{::head}, ~{::contenido})">
+<head th:fragment="head">
+    <title>Detalle Modelo - Regata Online</title>
+    <style>
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .detail-value {
+            color: #212529;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .color-display {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid #dee2e6;
+            display: inline-block;
+            margin-right: 15px;
+        }
+        .model-header {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="contenido">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/modelos">Modelos</a></li>
+                <li class="breadcrumb-item active" th:text="${modelo.nombre}"></li>
+            </ol>
+        </nav>
+
+        <!-- Encabezado -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="model-header">
+                <div class="color-display" th:style="'background-color: ' + ${modelo.color}"></div>
+                <div>
+                    <h1><i class="fas fa-cog me-2"></i>Detalle del Modelo</h1>
+                    <p class="text-muted mb-0" th:text="${modelo.nombre}"></p>
+                </div>
+            </div>
+            <div class="btn-group">
+                <a th:href="@{/modelos/{id}/editar(id=${modelo.id})}" class="btn btn-warning">
+                    <i class="fas fa-edit me-2"></i>Editar
+                </a>
+                <a th:href="@{/modelos/{id}/eliminar(id=${modelo.id})}" class="btn btn-danger">
+                    <i class="fas fa-trash me-2"></i>Eliminar
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Información del modelo -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Información del Modelo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <span class="detail-label">ID:</span>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="detail-value" th:text="${modelo.id}"></span>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <span class="detail-label">Nombre:</span>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="detail-value" th:text="${modelo.nombre}"></span>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <span class="detail-label">Color:</span>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="d-flex align-items-center">
+                                    <div class="color-display me-3" 
+                                         th:style="'background-color: ' + ${modelo.color} + '; width: 30px; height: 30px;'"></div>
+                                    <span class="detail-value" th:text="${modelo.color}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barcos que usan este modelo -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-anchor me-2"></i>Barcos que Usan este Modelo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${modelo.barcos.empty}" class="text-center py-3">
+                            <i class="fas fa-anchor fa-2x text-muted mb-2"></i>
+                            <p class="text-muted">No hay barcos que usen este modelo</p>
+                            <a href="/barcos/crear" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i>Crear Barco con este Modelo
+                            </a>
+                        </div>
+                        
+                        <div th:unless="${modelo.barcos.empty}">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Jugador</th>
+                                            <th>Posición X</th>
+                                            <th>Posición Y</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="barco : ${modelo.barcos}">
+                                            <td th:text="${barco.id}"></td>
+                                            <td th:text="${barco.jugador.nombre}"></td>
+                                            <td th:text="${barco.posX}"></td>
+                                            <td th:text="${barco.posY}"></td>
+                                            <td>
+                                                <a th:href="@{/barcos/{id}(id=${barco.id})}" 
+                                                   class="btn btn-sm btn-outline-info" 
+                                                   title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="col-md-4">
+                <div class="card stats-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-anchor fa-3x mb-3"></i>
+                        <h3 th:text="${modelo.barcos.size()}">0</h3>
+                        <p class="mb-0">Barcos Usando este Modelo</p>
+                    </div>
+                </div>
+
+                <!-- Vista previa del color -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-palette me-2"></i>Vista Previa del Color
+                        </h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="color-display mx-auto mb-3" 
+                             th:style="'background-color: ' + ${modelo.color} + '; width: 80px; height: 80px;'"></div>
+                        <p class="mb-0 text-muted" th:text="${modelo.color}"></p>
+                    </div>
+                </div>
+
+                <!-- Acciones rápidas -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-bolt me-2"></i>Acciones Rápidas
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="/barcos/crear" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-plus me-2"></i>Crear Barco
+                            </a>
+                            <a th:href="@{/modelos/{id}/editar(id=${modelo.id})}" class="btn btn-outline-warning btn-sm">
+                                <i class="fas fa-edit me-2"></i>Editar Modelo
+                            </a>
+                            <a href="/modelos" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-list me-2"></i>Ver Todos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón de regreso -->
+        <div class="mt-4">
+            <a href="/modelos" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver a la Lista
+            </a>
+        </div>
+    </div>
+</body>
+</html>

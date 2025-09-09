@@ -1,0 +1,54 @@
+/* Estilos globales para la aplicación Regata Online */
+
+/* Navegación */
+.navbar-brand {
+    font-weight: bold;
+    color: white !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    transition: text-shadow 0.3s ease;
+}
+
+.navbar-brand:hover {
+    color: white !important;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+/* Tarjetas */
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* Botones */
+.btn-primary {
+    background-color: #0066cc;
+    border-color: #0066cc;
+}
+
+.btn-primary:hover {
+    background-color: #0052a3;
+    border-color: #0052a3;
+}
+
+/* Tablas */
+.table th {
+    background-color: #f8f9fa;
+}
+
+/* Alertas */
+.alert {
+    margin-bottom: 1rem;
+}
+
+/* Formularios */
+.form-label {
+    font-weight: 500;
+}
+
+.required {
+    color: #dc3545;
+}

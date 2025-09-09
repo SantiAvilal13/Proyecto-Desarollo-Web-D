@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout :: layout(~{::head}, ~{::contenido})">
+<head th:fragment="head">
+    <title>Lista de Barcos - Regata Online</title>
+    <link th:href="@{/css/barcos.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:fragment="contenido">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item active">Barcos</li>
+            </ol>
+        </nav>
+
+        <!-- Alertas -->
+        <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Encabezado -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1><i class="fas fa-anchor me-2"></i>Lista de Barcos</h1>
+                <p class="text-muted mb-0">Gestiona todos los barcos de la regata</p>
+            </div>
+            <a href="/barcos/crear" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Nuevo Barco
+            </a>
+        </div>
+
+        <!-- Estadísticas rápidas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-anchor fa-2x text-primary mb-2"></i>
+                        <h5 class="card-title" th:text="${barcos.size()}">0</h5>
+                        <p class="card-text text-muted">Total Barcos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-users fa-2x text-success mb-2"></i>
+                        <h5 class="card-title">-</h5>
+                        <p class="card-text text-muted">Propietarios</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-cogs fa-2x text-warning mb-2"></i>
+                        <h5 class="card-title">-</h5>
+                        <p class="card-text text-muted">Modelos Únicos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-map-marker-alt fa-2x text-info mb-2"></i>
+                        <h5 class="card-title">-</h5>
+                        <p class="card-text text-muted">Posiciones Únicas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de barcos -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>Barcos Registrados
+                    <span class="badge bg-primary ms-2" th:text="${barcos.size()}"></span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div th:if="${barcos.empty}" class="text-center py-5">
+                    <i class="fas fa-anchor fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No hay barcos registrados</h5>
+                    <p class="text-muted">Comienza agregando el primer barco a la regata</p>
+                    <a href="/barcos/crear" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Crear Primer Barco
+                    </a>
+                </div>
+
+                <div th:if="${!barcos.empty}" class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Propietario</th>
+                                <th>Modelo</th>
+                                <th>Posición</th>
+                                <th>Color</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="barco : ${barcos}">
+                                <td>
+                                    <strong th:text="${barco.id}"></strong>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-user text-muted me-2"></i>
+                                        <div>
+                                            <div th:text="${barco.jugador.nombre}"></div>
+                                            <small class="text-muted" th:text="${barco.jugador.email}"></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-cog text-muted me-2"></i>
+                                        <span th:text="${barco.modelo.nombre}"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="position-badge">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        <span th:text="'(' + ${barco.posX} + ', ' + ${barco.posY} + ')'"></span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="color-indicator" th:style="'background-color: ' + ${barco.modelo.color}"></div>
+                                        <span th:text="${barco.modelo.color}"></span>
+                                    </div>
+                                </td>
+                                <td class="text-center action-buttons">
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/barcos/{id}(id=${barco.id})}" 
+                                           class="btn btn-sm btn-outline-primary" 
+                                           title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a th:href="@{/barcos/{id}/editar(id=${barco.id})}" 
+                                           class="btn btn-sm btn-outline-warning" 
+                                           title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a th:href="@{/barcos/{id}/eliminar(id=${barco.id})}" 
+                                           class="btn btn-sm btn-outline-danger" 
+                                           title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones adicionales -->
+        <div class="mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="fas fa-plus-circle me-2"></i>Acciones Rápidas
+                            </h6>
+                            <div class="d-grid gap-2">
+                                <a href="/barcos/crear" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus me-2"></i>Nuevo Barco
+                                </a>
+                                <a href="/jugadores" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-users me-2"></i>Ver Jugadores
+                                </a>
+                                <a href="/modelos" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-cogs me-2"></i>Ver Modelos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="fas fa-info-circle me-2"></i>Información
+                            </h6>
+                            <p class="card-text small text-muted">
+                                Los barcos representan las embarcaciones de cada jugador en la regata. 
+                                Cada barco tiene un propietario, un modelo específico y una posición en el mapa.
+                            </p>
+                            <a href="/mapas" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-map me-1"></i>Ver Mapa
+                        </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

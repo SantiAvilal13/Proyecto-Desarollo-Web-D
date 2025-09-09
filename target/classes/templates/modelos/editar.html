@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout :: layout(~{::head}, ~{::contenido})">
+<head th:fragment="head">
+    <title>Editar Modelo - Regata Online</title>
+    <link th:href="@{/css/modelos.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:fragment="contenido">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/modelos">Modelos</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/modelos/{id}(id=${modelo.id})}" th:text="${modelo.nombre}"></a></li>
+                <li class="breadcrumb-item active">Editar</li>
+            </ol>
+        </nav>
+
+        <!-- Encabezado -->
+        <div class="mb-4">
+            <h1><i class="fas fa-cog me-2"></i>Editar Modelo</h1>
+            <p class="text-muted">Modifica la información del modelo <strong th:text="${modelo.nombre}"></strong></p>
+        </div>
+
+        <!-- Formulario -->
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <form th:action="@{/modelos/{id}(id=${modelo.id})}" th:object="${modelo}" method="post">
+                            <!-- ID oculto -->
+                            <input type="hidden" th:field="*{id}">
+                            
+                            <!-- Nombre -->
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">
+                                    Nombre del Modelo <span class="required">*</span>
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="nombre" 
+                                       th:field="*{nombre}"
+                                       th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''"
+                                       placeholder="Ej: Velero Clásico, Yate Deportivo, etc."
+                                       required>
+                                <div th:if="${#fields.hasErrors('nombre')}" class="invalid-feedback">
+                                    <span th:errors="*{nombre}"></span>
+                                </div>
+                            </div>
+
+                            <!-- Color -->
+                            <div class="mb-3">
+                                <label for="color" class="form-label">
+                                    Color <span class="required">*</span>
+                                </label>
+                                <div class="d-flex align-items-center">
+                                    <input type="color" 
+                                           class="form-control form-control-color" 
+                                           id="color" 
+                                           th:field="*{color}"
+                                           th:classappend="${#fields.hasErrors('color')} ? 'is-invalid' : ''"
+                                           style="width: 60px; height: 40px;"
+                                           required>
+                                    <input type="text" 
+                                           class="form-control ms-2" 
+                                           id="colorText" 
+                                           th:value="${modelo.color}"
+                                           placeholder="#0066cc"
+                                           pattern="^#[0-9A-Fa-f]{6}$"
+                                           readonly>
+                                    <div class="color-preview ms-2" id="colorPreview" th:style="'background-color: ' + ${modelo.color}"></div>
+                                </div>
+                                <div th:if="${#fields.hasErrors('color')}" class="invalid-feedback">
+                                    <span th:errors="*{color}"></span>
+                                </div>
+                                
+                                <!-- Colores sugeridos -->
+                                <div class="color-suggestions">
+                                    <div class="color-option" style="background-color: #0066cc;" data-color="#0066cc" title="Azul Océano"></div>
+                                    <div class="color-option" style="background-color: #ffc107;" data-color="#ffc107" title="Amarillo Dorado"></div>
+                                    <div class="color-option" style="background-color: #6f42c1;" data-color="#6f42c1" title="Púrpura Real"></div>
+                                    <div class="color-option" style="background-color: #fd7e14;" data-color="#fd7e14" title="Naranja Vibrante"></div>
+                                    <div class="color-option" style="background-color: #20c997;" data-color="#20c997" title="Turquesa"></div>
+                                    <div class="color-option" style="background-color: #e83e8c;" data-color="#e83e8c" title="Rosa Magenta"></div>
+                                    <div class="color-option" style="background-color: #17a2b8;" data-color="#17a2b8" title="Cian Agua"></div>
+                                    <div class="color-option" style="background-color: #343a40;" data-color="#343a40" title="Negro Carbón"></div>
+                                </div>
+                                <small class="form-text text-muted">Haz clic en un color sugerido o usa el selector personalizado</small>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/modelos/{id}(id=${modelo.id})}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Actualizar Modelo
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Información:</strong> Los campos marcados con <span class="required">*</span> son obligatorios. El nombre del modelo debe ser único.
+                </div>
+                <div th:if="${!modelo.barcos.empty}" class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Atención:</strong> Este modelo está siendo usado por <span th:text="${modelo.barcos.size()}"></span> barco(s). Los cambios se aplicarán a todos los barcos que usen este modelo.
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script>
+            const colorPicker = document.getElementById('color');
+            const colorText = document.getElementById('colorText');
+            const colorPreview = document.getElementById('colorPreview');
+            const colorOptions = document.querySelectorAll('.color-option');
+            const form = document.querySelector('form');
+            
+            // Colores prohibidos del mapa
+            const forbiddenColors = ['#28a745', '#dc3545', '#6c757d'];
+            
+            function isForbiddenColor(color) {
+                return forbiddenColors.includes(color.toLowerCase());
+            }
+            
+            function showColorError(message) {
+                // Remover error anterior si existe
+                const existingError = document.querySelector('.color-error');
+                if (existingError) {
+                    existingError.remove();
+                }
+                
+                // Crear nuevo mensaje de error
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'invalid-feedback color-error d-block';
+                errorDiv.textContent = message;
+                colorPreview.parentNode.appendChild(errorDiv);
+                
+                // Agregar clase de error al color picker
+                colorPicker.classList.add('is-invalid');
+            }
+            
+            function clearColorError() {
+                const errorDiv = document.querySelector('.color-error');
+                if (errorDiv) {
+                    errorDiv.remove();
+                }
+                colorPicker.classList.remove('is-invalid');
+            }
+
+            function updateColor(newColor, skipValidation = false) {
+                if (!skipValidation && isForbiddenColor(newColor)) {
+                    showColorError('No se pueden usar los colores del mapa (verde, rojo, gris).');
+                    return false;
+                } else {
+                    clearColorError();
+                }
+                
+                colorPicker.value = newColor;
+                colorText.value = newColor;
+                colorPreview.style.backgroundColor = newColor;
+                return true;
+            }
+
+            // Sincronizar color picker con preview
+            colorPicker.addEventListener('input', function() {
+                const color = this.value;
+                colorText.value = color;
+                colorPreview.style.backgroundColor = color;
+                
+                if (isForbiddenColor(color)) {
+                    showColorError('No se pueden usar los colores del mapa (verde, rojo, gris).');
+                } else {
+                    clearColorError();
+                }
+            });
+
+            // Manejar clicks en colores sugeridos
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    if (updateColor(color)) {
+                        // Remover selección anterior
+                        colorOptions.forEach(opt => opt.classList.remove('selected'));
+                        // Agregar selección actual
+                        this.classList.add('selected');
+                    }
+                });
+            });
+            
+            // Validar antes de enviar el formulario
+            form.addEventListener('submit', function(e) {
+                const currentColor = colorPicker.value;
+                if (isForbiddenColor(currentColor)) {
+                    e.preventDefault();
+                    showColorError('No se pueden usar los colores del mapa (verde, rojo, gris).');
+                    return false;
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

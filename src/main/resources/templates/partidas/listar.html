@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::head}, ~{::contenido})}">
+<head>
+    <title>Partidas - Regata</title>
+    <style>
+        .card-stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .card-disponibles {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .card-en-juego {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .card-terminadas {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        .estado-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+        .partida-card {
+            transition: transform 0.2s;
+        }
+        .partida-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="contenido">
+        <!-- Alertas -->
+        <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje} + ' alert-dismissible fade show'" role="alert">
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Encabezado -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-gamepad me-2"></i>Gestión de Partidas</h1>
+            <a href="/partidas/crear" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Nueva Partida
+            </a>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card card-stats text-center">
+                    <div class="card-body">
+                        <i class="fas fa-gamepad fa-2x mb-2"></i>
+                        <h3 th:text="${totalPartidas}">0</h3>
+                        <p class="mb-0">Total Partidas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-disponibles text-center">
+                    <div class="card-body">
+                        <i class="fas fa-clock fa-2x mb-2"></i>
+                        <h3 th:text="${partidasEsperando}">0</h3>
+                        <p class="mb-0">Esperando Jugadores</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-en-juego text-center">
+                    <div class="card-body">
+                        <i class="fas fa-play fa-2x mb-2"></i>
+                        <h3 th:text="${partidasActivas}">0</h3>
+                        <p class="mb-0">En Juego</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-terminadas text-center">
+                    <div class="card-body">
+                        <i class="fas fa-trophy fa-2x mb-2"></i>
+                        <h3 th:text="${#lists.size(partidasTerminadas)}">0</h3>
+                        <p class="mb-0">Terminadas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Partidas Disponibles -->
+        <div class="row mb-4" th:if="${#lists.size(partidasDisponibles) > 0}">
+            <div class="col-12">
+                <h3><i class="fas fa-users text-warning me-2"></i>Partidas Disponibles</h3>
+                <div class="row">
+                    <div class="col-md-6 col-lg-4 mb-3" th:each="partida : ${partidasDisponibles}">
+                        <div class="card partida-card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0" th:text="${partida.nombre}">Nombre Partida</h6>
+                                <span class="badge bg-warning estado-badge">Esperando</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    <i class="fas fa-map me-2"></i>
+                                    <span th:text="${partida.mapa.nombre}">Mapa</span>
+                                </p>
+                                <p class="card-text">
+                                    <i class="fas fa-users me-2"></i>
+                                    <span th:text="${#lists.size(partida.participantes)} + ' / ' + ${partida.maxJugadores}">0 / 4</span> jugadores
+                                </p>
+                                <p class="card-text text-muted small">
+                                    <i class="fas fa-calendar me-2"></i>
+                                    Creada: <span th:text="${#temporals.format(partida.fechaCreacion, 'dd/MM/yyyy HH:mm')}">Fecha</span>
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <a th:href="@{/partidas/{id}(id=${partida.id})}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Ver Detalles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Partidas En Juego -->
+        <div class="row mb-4" th:if="${#lists.size(partidasEnJuego) > 0}">
+            <div class="col-12">
+                <h3><i class="fas fa-play text-success me-2"></i>Partidas En Juego</h3>
+                <div class="row">
+                    <div class="col-md-6 col-lg-4 mb-3" th:each="partida : ${partidasEnJuego}">
+                        <div class="card partida-card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0" th:text="${partida.nombre}">Nombre Partida</h6>
+                                <span class="badge bg-success estado-badge">En Juego</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    <i class="fas fa-map me-2"></i>
+                                    <span th:text="${partida.mapa.nombre}">Mapa</span>
+                                </p>
+                                <p class="card-text">
+                                    <i class="fas fa-users me-2"></i>
+                                    <span th:text="${#lists.size(partida.participantes)}">0</span> jugadores
+                                </p>
+                                <p class="card-text">
+                                    <i class="fas fa-clock me-2"></i>
+                                    Turno: <span th:text="${partida.turnoActual}">1</span>
+                                </p>
+                                <p class="card-text text-muted small">
+                                    <i class="fas fa-play me-2"></i>
+                                    Iniciada: <span th:text="${#temporals.format(partida.fechaInicio, 'dd/MM/yyyy HH:mm')}">Fecha</span>
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <a th:href="@{/partidas/{id}/jugar(id=${partida.id})}" class="btn btn-success btn-sm me-2">
+                                    <i class="fas fa-gamepad me-1"></i>Jugar
+                                </a>
+                                <a th:href="@{/partidas/{id}(id=${partida.id})}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Ver
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Partidas Terminadas -->
+        <div class="row mb-4" th:if="${#lists.size(partidasTerminadas) > 0}">
+            <div class="col-12">
+                <h3><i class="fas fa-trophy text-info me-2"></i>Partidas Terminadas</h3>
+                <div class="row">
+                    <div class="col-md-6 col-lg-4 mb-3" th:each="partida : ${partidasTerminadas}">
+                        <div class="card partida-card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0" th:text="${partida.nombre}">Nombre Partida</h6>
+                                <span class="badge bg-info estado-badge">Terminada</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    <i class="fas fa-map me-2"></i>
+                                    <span th:text="${partida.mapa.nombre}">Mapa</span>
+                                </p>
+                                <p class="card-text">
+                                    <i class="fas fa-users me-2"></i>
+                                    <span th:text="${#lists.size(partida.participantes)}">0</span> jugadores
+                                </p>
+                                <p class="card-text text-muted small">
+                                    <i class="fas fa-flag-checkered me-2"></i>
+                                    Terminada: <span th:text="${#temporals.format(partida.fechaFin, 'dd/MM/yyyy HH:mm')}">Fecha</span>
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <a th:href="@{/partidas/{id}(id=${partida.id})}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Ver Resultados
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensaje si no hay partidas -->
+        <div class="text-center py-5" th:if="${#lists.size(partidas) == 0}">
+            <i class="fas fa-gamepad fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">No hay partidas creadas</h4>
+            <p class="text-muted">Crea tu primera partida para comenzar a jugar</p>
+            <a href="/partidas/crear" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Crear Primera Partida
+            </a>
+        </div>
+    </div>
+</body>
+</html>

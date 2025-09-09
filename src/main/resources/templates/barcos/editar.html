@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Editar Barco - Regata Online</title>
+</head>
+<body>
+    <main>
+        <div class="container-fluid py-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-ship me-2"></i>
+                                Editar Barco
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/barcos/{id}(id=${barco.id})}" th:object="${barco}" method="post">
+                                <input type="hidden" name="_method" value="PUT">
+                                
+                                <!-- Información básica -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="jugadorId" class="form-label">Propietario</label>
+                                        <select class="form-select" id="jugadorId" th:field="*{jugador}">
+                                            <option value="">Seleccionar jugador...</option>
+                                            <option th:each="jugador : ${jugadores}" 
+                                                    th:value="${jugador.id}" 
+                                                    th:text="${jugador.nombre + ' (' + jugador.email + ')'}"
+                                                    th:selected="${jugador.id == barco.jugador.id}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="modeloId" class="form-label">Modelo</label>
+                                        <select class="form-select" id="modeloId" th:field="*{modelo}">
+                                            <option value="">Seleccionar modelo...</option>
+                                            <option th:each="modelo : ${modelos}" 
+                                                    th:value="${modelo.id}" 
+                                                    th:text="${modelo.nombre}"
+                                                    th:selected="${modelo.id == barco.modelo.id}">
+                                            </option>
+                                        </select>
+                                        <div id="colorPreview" class="color-preview mt-2" style="display: none;"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Posición -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="posX" class="form-label">Posición X</label>
+                                        <input type="number" class="form-control" id="posX" th:field="*{posX}" min="0" max="99" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="posY" class="form-label">Posición Y</label>
+                                        <input type="number" class="form-control" id="posY" th:field="*{posY}" min="0" max="99" required>
+                                    </div>
+                                </div>
+                                
+                                <!-- Velocidad -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="velX" class="form-label">Velocidad X</label>
+                                        <input type="number" class="form-control" id="velX" th:field="*{velX}" step="0.1">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="velY" class="form-label">Velocidad Y</label>
+                                        <input type="number" class="form-control" id="velY" th:field="*{velY}" step="0.1">
+                                    </div>
+                                </div>
+                                
+                                <!-- Botones -->
+                                <div class="d-flex justify-content-between">
+                                    <a th:href="@{/barcos}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i>Volver
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>Guardar Cambios
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scripts simplificados -->
+        <script>
+            // Mostrar preview del color del modelo
+            document.addEventListener('DOMContentLoaded', function() {
+                const modeloSelect = document.getElementById('modeloId');
+                const colorPreview = document.getElementById('colorPreview');
+                
+                if (modeloSelect && colorPreview) {
+                    modeloSelect.addEventListener('change', function() {
+                        const selectedOption = this.options[this.selectedIndex];
+                        
+                        if (selectedOption.value && selectedOption.dataset.color) {
+                            colorPreview.style.backgroundColor = selectedOption.dataset.color;
+                            colorPreview.style.display = 'inline-block';
+                        } else {
+                            colorPreview.style.display = 'none';
+                        }
+                    });
+                }
+            });
+        </script>
+    </main>
+</body>
+</html>

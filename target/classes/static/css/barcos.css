@@ -1,0 +1,30 @@
+/* Estilos específicos para las páginas de barcos */
+
+/* Botones de acción */
+.action-buttons {
+    white-space: nowrap;
+}
+
+/* Indicador de color */
+.color-indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #dee2e6;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+/* Badge de posición */
+.position-badge {
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+}
+
+/* Estilos adicionales para tablas de barcos */
+.table th {
+    border-top: none;
+}

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::head}, ~{::contenido})}">
+<head>
+    <title th:text="'Partida: ' + ${partida.nombre} + ' - Regata'">Detalle Partida - Regata</title>
+    <style>
+        .estado-esperando { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .estado-en-juego { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .estado-terminada { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .participante-card {
+            transition: transform 0.2s;
+        }
+        .participante-card:hover {
+            transform: translateY(-2px);
+        }
+        .mapa-preview {
+            max-width: 300px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="contenido">
+        <!-- Alertas -->
+        <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje} + ' alert-dismissible fade show'" role="alert">
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Encabezado -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 th:text="${partida.nombre}">Nombre de la Partida</h1>
+                <span th:class="'badge fs-6 text-white ' + 
+                    (${partida.estado.name()} == 'ESPERANDO' ? 'estado-esperando' : 
+                     ${partida.estado.name()} == 'EN_JUEGO' ? 'estado-en-juego' : 'estado-terminada')"
+                      th:text="${partida.estado.name() == 'ESPERANDO' ? 'Esperando Jugadores' : 
+                               partida.estado.name() == 'EN_JUEGO' ? 'En Juego' : 
+                               partida.estado.name() == 'TERMINADA' ? 'Terminada' : 'Cancelada'}">Estado</span>
+            </div>
+            <div>
+                <a href="/partidas" class="btn btn-secondary me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Volver
+                </a>
+                <div class="btn-group" th:if="${partida.estado.name() == 'ESPERANDO'}">
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#unirseModal">
+                        <i class="fas fa-user-plus me-2"></i>Unirse
+                    </button>
+                    <form th:action="@{/partidas/{id}/iniciar(id=${partida.id})}" method="post" class="d-inline" th:if="${#lists.size(participantes) >= 2}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-play me-2"></i>Iniciar Partida
+                        </button>
+                    </form>
+                </div>
+                <a th:href="@{/partidas/{id}/jugar(id=${partida.id})}" class="btn btn-success" th:if="${partida.estado.name() == 'EN_JUEGO'}">
+                    <i class="fas fa-gamepad me-2"></i>Jugar
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Información de la Partida -->
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle me-2"></i>Información</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong><i class="fas fa-map me-2"></i>Mapa:</strong> <span th:text="${partida.mapa.nombre}">Nombre del Mapa</span></p>
+                        <p><strong><i class="fas fa-expand-arrows-alt me-2"></i>Dimensiones:</strong> <span th:text="${partida.mapa.ancho} + 'x' + ${partida.mapa.alto}">10x10</span></p>
+                        <p><strong><i class="fas fa-users me-2"></i>Jugadores:</strong> <span th:text="${#lists.size(participantes)} + ' / ' + ${partida.maxJugadores}">0 / 4</span></p>
+                        <p><strong><i class="fas fa-calendar me-2"></i>Creada:</strong> <span th:text="${#temporals.format(partida.fechaCreacion, 'dd/MM/yyyy HH:mm')}">Fecha</span></p>
+                        <p th:if="${partida.fechaInicio}">
+                            <strong><i class="fas fa-play me-2"></i>Iniciada:</strong> 
+                            <span th:text="${#temporals.format(partida.fechaInicio, 'dd/MM/yyyy HH:mm')}">Fecha</span>
+                        </p>
+                        <p th:if="${partida.fechaFin}">
+                            <strong><i class="fas fa-flag-checkered me-2"></i>Terminada:</strong> 
+                            <span th:text="${#temporals.format(partida.fechaFin, 'dd/MM/yyyy HH:mm')}">Fecha</span>
+                        </p>
+                        <p th:if="${partida.estado.name() == 'EN_JUEGO'}">
+                            <strong><i class="fas fa-clock me-2"></i>Turno Actual:</strong> 
+                            <span th:text="${partida.turnoActual}">1</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Posiciones -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-map-marker-alt me-2"></i>Posiciones</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong><i class="fas fa-play text-success me-2"></i>Salida:</strong> 
+                           (<span th:text="${partida.salidaX}">0</span>, <span th:text="${partida.salidaY}">0</span>)</p>
+                        <p><strong><i class="fas fa-flag-checkered text-danger me-2"></i>Meta:</strong> 
+                           (<span th:text="${partida.metaX}">9</span>, <span th:text="${partida.metaY}">9</span>)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Participantes -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-users me-2"></i>Participantes</h5>
+                        <span class="badge bg-primary" th:text="${#lists.size(participantes)}">0</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" th:if="${#lists.size(participantes) > 0}">
+                            <div class="col-md-6 mb-3" th:each="participante : ${participantes}">
+                                <div class="card participante-card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-user-circle fa-2x text-primary"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1" th:text="${participante.jugador.nombre}">Nombre Jugador</h6>
+                                                <p class="mb-1 text-muted small">
+                                                    <i class="fas fa-sailboat me-1"></i>
+                                                    <span th:text="${participante.barco.nombre}">Nombre Barco</span>
+                                                </p>
+                                                <p class="mb-1 text-muted small">
+                                                    <i class="fas fa-sort-numeric-up me-1"></i>
+                                                    Orden: <span th:text="${participante.ordenTurno}">1</span>
+                                                </p>
+                                                <p class="mb-0 text-muted small" th:if="${partida.estado.name() == 'EN_JUEGO'}">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                                    Posición: (<span th:text="${participante.posicionX}">0</span>, <span th:text="${participante.posicionY}">0</span>)
+                                                </p>
+                                                <span class="badge bg-success" th:if="${participante.haLlegadoMeta}">¡Ganador!</span>
+                                            </div>
+                                            <div th:if="${partida.estado.name() == 'ESPERANDO'}">
+                                                <form th:action="@{/partidas/{id}/salir(id=${partida.id})}" method="post" class="d-inline">
+                                                    <input type="hidden" name="jugadorId" th:value="${participante.jugador.id}">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" 
+                                                            onclick="return confirm('¿Estás seguro de que quieres salir de la partida?')">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center py-4" th:if="${#lists.size(participantes) == 0}">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No hay participantes</h5>
+                            <p class="text-muted">Sé el primero en unirte a esta partida</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ganadores (solo si la partida está terminada) -->
+                <div class="card mt-4" th:if="${partida.estado.name() == 'TERMINADA' and #lists.size(ganadores) > 0}">
+                    <div class="card-header">
+                        <h5><i class="fas fa-trophy me-2 text-warning"></i>Ganadores</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-2" th:each="ganador, iterStat : ${ganadores}">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <i class="fas fa-medal fa-2x" 
+                                           th:class="'fas fa-medal fa-2x ' + 
+                                                   (${iterStat.index == 0} ? 'text-warning' : 
+                                                    ${iterStat.index == 1} ? 'text-secondary' : 'text-dark')"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0" th:text="${iterStat.index + 1} + '° ' + ${ganador.jugador.nombre}">1° Jugador</h6>
+                                        <small class="text-muted" th:text="${ganador.barco.nombre}">Barco</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para unirse a la partida -->
+        <div class="modal fade" id="unirseModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Unirse a la Partida</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form th:action="@{/partidas/{id}/unirse(id=${partida.id})}" method="post">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="jugadorId" class="form-label">
+                                    <i class="fas fa-user me-2"></i>Selecciona tu Jugador
+                                </label>
+                                <select class="form-select" name="jugadorId" id="jugadorId" required>
+                                    <option value="">Seleccionar jugador...</option>
+                                    <option th:each="jugador : ${jugadores}" 
+                                            th:value="${jugador.id}" 
+                                            th:text="${jugador.nombre}">Jugador</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="barcoId" class="form-label">
+                                    <i class="fas fa-sailboat me-2"></i>Selecciona tu Barco
+                                </label>
+                                <select class="form-select" name="barcoId" id="barcoId" required>
+                                    <option value="">Seleccionar barco...</option>
+                                    <option th:each="barco : ${barcos}" 
+                                            th:value="${barco.id}" 
+                                            th:text="${barco.nombre + ' (' + barco.modelo.nombre + ')'}">Barco</option>
+                                </select>
+                            </div>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Una vez que te unas, comenzarás en la posición de salida cuando inicie la partida.
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-user-plus me-2"></i>Unirse
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

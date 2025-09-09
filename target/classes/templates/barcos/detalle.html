@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::head}, ~{::contenido})}">
+<head>
+    <style>
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .detail-value {
+            color: #212529;
+        }
+        .color-display {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid #dee2e6;
+            display: inline-block;
+            margin-right: 15px;
+        }
+        .position-display {
+            background-color: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        .info-icon {
+            color: #6c757d;
+            margin-right: 8px;
+        }
+        .action-card {
+            transition: transform 0.2s;
+        }
+        .action-card:hover {
+            transform: translateY(-2px);
+        }
+        .boat-visualization {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .boat-icon {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+        .wave-animation {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: repeating-linear-gradient(
+                90deg,
+                #2196f3 0px,
+                #2196f3 10px,
+                #1976d2 10px,
+                #1976d2 20px
+            );
+            animation: wave 2s linear infinite;
+        }
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(20px); }
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="contenido">
+        <!-- Contenido principal -->
+        <div class="container mt-4">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="/barcos">Barcos</a></li>
+                    <li class="breadcrumb-item active" th:text="'Barco #' + ${barco.id}"></li>
+                </ol>
+            </nav>
+
+            <!-- Encabezado -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1>
+                        <i class="fas fa-anchor me-2"></i>
+                        <span th:text="'Barco #' + ${barco.id}"></span>
+                    </h1>
+                    <p class="text-muted mb-0" th:text="'Propiedad de ' + ${barco.jugador.nombre}"></p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a th:href="@{/barcos/{id}/editar(id=${barco.id})}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>Editar
+                    </a>
+                    <a th:href="@{/barcos/{id}/eliminar(id=${barco.id})}" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Eliminar
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Información principal -->
+                <div class="col-md-8">
+                    <!-- Visualización del barco -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="boat-visualization">
+                                <div class="boat-icon" th:style="'color: ' + ${barco.modelo.color}">
+                                    <i class="fas fa-ship"></i>
+                                </div>
+                                <h4 th:text="${barco.modelo.nombre}"></h4>
+                                <p class="mb-0 text-muted">Navegando en posición <span th:text="'(' + ${barco.posX} + ', ' + ${barco.posY} + ')'"></span></p>
+                                <div class="wave-animation"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detalles del barco -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Información del Barco
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <span class="detail-label">
+                                            <i class="fas fa-hashtag info-icon"></i>ID del Barco:
+                                        </span>
+                                        <div class="detail-value" th:text="${barco.id}"></div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <span class="detail-label">
+                                            <i class="fas fa-user info-icon"></i>Propietario:
+                                        </span>
+                                        <div class="detail-value">
+                                            <a th:href="@{/jugadores/{id}(id=${barco.jugador.id})}" 
+                                               class="text-decoration-none" 
+                                               th:text="${barco.jugador.nombre}"></a>
+                                            <br>
+                                            <small class="text-muted" th:text="${barco.jugador.email}"></small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <span class="detail-label">
+                                            <i class="fas fa-cog info-icon"></i>Modelo:
+                                        </span>
+                                        <div class="detail-value">
+                                            <a th:href="@{/modelos/{id}(id=${barco.modelo.id})}" 
+                                               class="text-decoration-none" 
+                                               th:text="${barco.modelo.nombre}"></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <span class="detail-label">
+                                            <i class="fas fa-palette info-icon"></i>Color del Modelo:
+                                        </span>
+                                        <div class="detail-value d-flex align-items-center">
+                                            <div class="color-display" th:style="'background-color: ' + ${barco.modelo.color}"></div>
+                                            <span th:text="${barco.modelo.color}"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <span class="detail-label">
+                                            <i class="fas fa-map-marker-alt info-icon"></i>Posición:
+                                        </span>
+                                        <div class="detail-value">
+                                            <div class="position-display">
+                                                <i class="fas fa-crosshairs me-2"></i>
+                                                <span th:text="'X: ' + ${barco.posX} + ', Y: ' + ${barco.posY}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones rápidas -->
+                <div class="col-md-4">
+                    <!-- Acciones principales -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-bolt me-2"></i>Acciones Rápidas
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a th:href="@{/barcos/{id}/editar(id=${barco.id})}" 
+                                   class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit me-2"></i>Editar Barco
+                                </a>
+                                <a th:href="@{/barcos/{id}/eliminar(id=${barco.id})}" 
+                                   class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash me-2"></i>Eliminar Barco
+                                </a>
+                                <hr>
+                                <a href="/barcos/crear" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus me-2"></i>Nuevo Barco
+                                </a>
+                                <a href="/barcos" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-list me-2"></i>Ver Todos los Barcos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información relacionada -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-link me-2"></i>Información Relacionada
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="action-card mb-3">
+                                <a th:href="@{/jugadores/{id}(id=${barco.jugador.id})}" 
+                                   class="text-decoration-none">
+                                    <div class="d-flex align-items-center p-2 border rounded">
+                                        <i class="fas fa-user fa-2x text-primary me-3"></i>
+                                        <div>
+                                            <strong>Ver Propietario</strong>
+                                            <br>
+                                            <small class="text-muted" th:text="${barco.jugador.nombre}"></small>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            
+                            <div class="action-card mb-3">
+                                <a th:href="@{/modelos/{id}(id=${barco.modelo.id})}" 
+                                   class="text-decoration-none">
+                                    <div class="d-flex align-items-center p-2 border rounded">
+                                        <i class="fas fa-cog fa-2x text-warning me-3"></i>
+                                        <div>
+                                            <strong>Ver Modelo</strong>
+                                            <br>
+                                            <small class="text-muted" th:text="${barco.modelo.nombre}"></small>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            
+                            <div class="action-card">
+                                <a href="/mapas" class="text-decoration-none">
+                                    <div class="d-flex align-items-center p-2 border rounded">
+                                        <i class="fas fa-map fa-2x text-info me-3"></i>
+                                        <div>
+                                            <strong>Ver en Mapa</strong>
+                                            <br>
+                                            <small class="text-muted">Ubicación en la regata</small>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>Estadísticas
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <h5 class="text-primary" th:text="${barco.posX}"></h5>
+                                        <small class="text-muted">Coord. X</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h5 class="text-primary" th:text="${barco.posY}"></h5>
+                                    <small class="text-muted">Coord. Y</small>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="text-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Posición actual en el mapa de regata
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

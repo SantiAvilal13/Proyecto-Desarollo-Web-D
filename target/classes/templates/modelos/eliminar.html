@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout :: layout(~{::head}, ~{::contenido})">
+<head th:fragment="head">
+    <title>Eliminar Modelo - Regata Online</title>
+    <link th:href="@{/css/modelos.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:fragment="contenido">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/modelos">Modelos</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/modelos/{id}(id=${modelo.id})}" th:text="${modelo.nombre}"></a></li>
+                <li class="breadcrumb-item active">Eliminar</li>
+            </ol>
+        </nav>
+
+        <!-- Encabezado -->
+        <div class="mb-4">
+            <h1 class="text-danger"><i class="fas fa-cog me-2"></i>Eliminar Modelo</h1>
+            <p class="text-muted">¿Estás seguro de que deseas eliminar este modelo?</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <!-- Advertencia -->
+                <div class="alert alert-danger warning-card" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>¡Atención!</strong> Esta acción no se puede deshacer. Al eliminar este modelo:
+                    <ul class="mt-2 mb-0">
+                        <li>Se perderá toda la información del modelo</li>
+                        <li th:if="${!modelo.barcos.empty}">Se eliminarán también <strong th:text="${modelo.barcos.size()}"></strong> barco(s) que usan este modelo</li>
+                        <li th:if="${modelo.barcos.empty}">No hay barcos que usen este modelo</li>
+                        <li>Los jugadores propietarios de los barcos afectados perderán sus embarcaciones</li>
+                    </ul>
+                </div>
+
+                <!-- Información del modelo -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Información del Modelo a Eliminar
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-sm-3">
+                                <span class="detail-label">ID:</span>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="detail-value" th:text="${modelo.id}"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3">
+                                <span class="detail-label">Nombre:</span>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="detail-value" th:text="${modelo.nombre}"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3">
+                                <span class="detail-label">Color:</span>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="d-flex align-items-center">
+                                    <div class="color-display" th:style="'background-color: ' + ${modelo.color}"></div>
+                                    <span class="detail-value" th:text="${modelo.color}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <span class="detail-label">Barcos:</span>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="detail-value" th:text="${modelo.barcos.size()} + ' barco(s) usando este modelo'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de barcos afectados -->
+                <div th:if="${!modelo.barcos.empty}" class="card mt-4">
+                    <div class="card-header">
+                        <h6 class="mb-0 text-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Barcos que serán eliminados
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>ID Barco</th>
+                                        <th>Propietario</th>
+                                        <th>Posición</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="barco : ${modelo.barcos}">
+                                        <td th:text="${barco.id}"></td>
+                                        <td th:text="${barco.jugador.nombre}"></td>
+                                        <td th:text="'(' + ${barco.posX} + ', ' + ${barco.posY} + ')'"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario de confirmación -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <form th:action="@{/modelos/{id}/eliminar(id=${modelo.id})}" method="post">
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/modelos/{id}(id=${modelo.id})}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash me-2"></i>Confirmar Eliminación
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="mt-4">
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Sugerencia:</strong> Si solo necesitas modificar el modelo, considera editarlo en lugar de eliminarlo para preservar los barcos existentes.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

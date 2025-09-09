@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout :: layout(~{::head}, ~{::contenido})">
+<head th:fragment="head">
+    <title>Eliminar Jugador - Regata Online</title>
+</head>
+<body>
+    <div th:fragment="contenido">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/jugadores">Jugadores</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/jugadores/{id}(id=${jugador.id})}" th:text="${jugador.nombre}"></a></li>
+                <li class="breadcrumb-item active">Eliminar</li>
+            </ol>
+        </nav>
+
+        <!-- Encabezado -->
+        <div class="mb-4">
+            <h1 class="text-danger"><i class="fas fa-user-times me-2"></i>Eliminar Jugador</h1>
+            <p class="text-muted">¿Estás seguro de que deseas eliminar este jugador?</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <!-- Advertencia -->
+                <div class="alert alert-danger warning-card" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>¡Atención!</strong> Esta acción no se puede deshacer. Al eliminar este jugador:
+                    <ul class="mt-2 mb-0">
+                        <li>Se perderá toda la información del jugador</li>
+                        <li th:if="${!jugador.barcos.empty}">Se eliminarán también <strong th:text="${jugador.barcos.size()}"></strong> barco(s) asociado(s)</li>
+                        <li th:if="${jugador.barcos.empty}">No hay barcos asociados que se vean afectados</li>
+                    </ul>
+                </div>
+
+                <!-- Información del jugador -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Información del Jugador a Eliminar
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-sm-3">
+                                <span class="detail-label">ID:</span>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="detail-value" th:text="${jugador.id}"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3">
+                                <span class="detail-label">Nombre:</span>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="detail-value" th:text="${jugador.nombre}"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3">
+                                <span class="detail-label">Email:</span>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="detail-value" th:text="${jugador.email}"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <span class="detail-label">Barcos:</span>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="detail-value" th:text="${jugador.barcos.size()} + ' barco(s) registrado(s)'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario de confirmación -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <form th:action="@{/jugadores/{id}/eliminar(id=${jugador.id})}" method="post">
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/jugadores/{id}(id=${jugador.id})}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash me-2"></i>Confirmar Eliminación
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="mt-4">
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Sugerencia:</strong> Si solo necesitas desactivar temporalmente al jugador, considera editarlo en lugar de eliminarlo.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
