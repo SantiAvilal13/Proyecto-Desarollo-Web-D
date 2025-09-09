@@ -225,11 +225,10 @@ Proyecto académico - Pontificia Universidad Javeriana
 ---
 
 **Estado del Proyecto**: ✅ Funcional - En desarrollo activo
-**Última Actualización**: Enero 2025
+**Última Actualización**: Septiembre 2025
 **Repositorio**: https://github.com/SantiAvilal13/Proyecto-Desarollo-Web-D.git
 
 ## 👥 Desarrolladores
-- Santiago Ávila - Desarrollo Full Stack
-
-## 📞 Contacto
-Para consultas sobre el proyecto, contactar a través del repositorio de GitHub.
+- Santiago Ávila 
+-Vaneza Mayorga
+-Fernanda Rios
